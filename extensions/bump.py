@@ -143,7 +143,7 @@ class Bump(commands.Cog):
         await interaction.followup.send(file=discord.File("bump.png"))
 
     @app_commands.command(
-        name="nextbump", description="Tells you when the last bump was"
+        name="nextbump", description="Tells you when the next bump is"
     )
     async def slash_nextbump(self, interaction: discord.Interaction):
         if not self.next_bump_dt:

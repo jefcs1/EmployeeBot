@@ -35,17 +35,17 @@ class Accessibility(commands.Cog):
         embed.set_footer(text="This bot was made by jef :)")
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(
+    @discord.ext.commands.hybrid_command(
         name="donate", description="Tells you how to donate to the server!"
     )
-    async def slash_donate(self, interaction: discord.Interaction):
-        ruby_role = discord.utils.get(interaction.guild.roles, id=964257308345528320)
+    async def slash_donate(self, ctx):
+        ruby_role = discord.utils.get(ctx.guild.roles, id=964257308345528320)
         sapphire_role = discord.utils.get(
-            interaction.guild.roles, id=964257414146850857
+            ctx.guild.roles, id=964257414146850857
         )
-        emerald_role = discord.utils.get(interaction.guild.roles, id=964257226506260590)
+        emerald_role = discord.utils.get(ctx.guild.roles, id=964257226506260590)
         donator_role = discord.utils.get(
-            interaction.guild.roles, id=1056690536905441341
+            ctx.guild.roles, id=1056690536905441341
         )
         donoEmbed = discord.Embed(title="**Donation**", color=0x86DEF2)
         donoEmbed.clear_fields()
@@ -71,7 +71,7 @@ class Accessibility(commands.Cog):
             value="[Send a Trade Offer here](https://steamcommunity.com/tradeoffer/new/?partner=1212841160&token=Ap7pvLax)",
         )
         donoEmbed.set_footer(text="This bot was made by jef :)")
-        await interaction.response.send_message(embed=donoEmbed)
+        await ctx.send(embed=donoEmbed)
 
     @app_commands.command(name="rules", description="Displays the server's rules!")
     async def slash_rules(self, interaction: discord.Interaction):
