@@ -72,7 +72,7 @@ class TicketButton(discord.ui.View):
         )
 
         await ticket_channel.send(
-            content=f"Thank you for opening a ticket {interaction.user.mention}\nA Staff member will be with you shortly.",
+            content=f"Thank you for opening a ticket {interaction.user.mention}\nA {support_role.mention} member will be with you shortly.",
             embed=TicketEmbed2,
             view=CloseButton(opener),
         )
