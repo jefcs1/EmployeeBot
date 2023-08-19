@@ -45,7 +45,9 @@ class ChatReminders(commands.Cog):
             "Don't believe the private message saying 'you won a giveaway' or similar. These are scammers, when you win an official giveaway you have to participate",
             "Don't click on any kind of Discord 'free Nitro' or 'Server invite'.",
             "No one will contact you to play in a tournament, like in FaceIt or ESEA, and don't log into any 'tournament websites'.",
-            "Steam giftcards can be charged back or bought with fraudulent credit cards which mostly brings problems"
+            "Steam giftcards can be charged back or bought with fraudulent credit cards which mostly brings problems",
+            "Triple Trading will **NEVER DM you on discord**."
+            "A good habit for Steam logins on trusted websites is the following:\n1.) Go to steamcommunity.com\n2.) Make sure you are logged in there\n3.) Go to the site where you want to log in\n4.) It should only require you to press login with your account with no need to enter the details once again"
         ]
 
         topggview = TopGGButton()
