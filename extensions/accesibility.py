@@ -11,16 +11,21 @@ class TopGGButton(discord.ui.View):
         super().__init__()
         self.value = None
 
+class SupportButton(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.value = None
+
 class Accessibility(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.logger = logging.getLogger(f"EmployeeBot.{self.__class__.__name__}")
 
-    @app_commands.command(
+    @discord.ext.commands.hybrid_command(
         name="boost", description="Tells you how to boost the server!"
     )
-    async def slash_boost(self, interaction: discord.Interaction):
-        booster_role = discord.utils.get(interaction.guild.roles, id=957426366494675036)
+    async def slash_boost(self,ctx):
+        booster_role = discord.utils.get(ctx.guild.roles, id=957426366494675036)
         embed = discord.Embed(title="**Server Boosting**", color=0x86DEF2)
         embed.clear_fields()
         embed.add_field(
@@ -33,7 +38,7 @@ class Accessibility(commands.Cog):
             value="This website has a great explanation:\n https://www.alphr.com/boost-discord-server/",
         )
         embed.set_footer(text="This bot was made by jef :)")
-        await interaction.response.send_message(embed=embed)
+        await ctx.send(embed=embed)
 
     @discord.ext.commands.hybrid_command(
         name="donate", description="Tells you how to donate to the server!"
@@ -73,15 +78,15 @@ class Accessibility(commands.Cog):
         donoEmbed.set_footer(text="This bot was made by jef :)")
         await ctx.send(embed=donoEmbed)
 
-    @app_commands.command(name="rules", description="Displays the server's rules!")
-    async def slash_rules(self, interaction: discord.Interaction):
+    @discord.ext.commands.hybrid_command(name="rules", description="Displays the server's rules!")
+    async def slash_rules(self, ctx):
         embed = discord.Embed(
             title="**Server Rules**",
             description="Here are the server's rules.",
             color=0x86DEF2,
         )
         embed.clear_fields()
-        embed.set_thumbnail(url=interaction.guild.icon)
+        embed.set_thumbnail(url=ctx.guild.icon)
         embed.add_field(
             name="**1) Absolutely no Scamming**",
             value="In Traders Compound, scamming is **strictly forbidden**. If you are caught scamming, you will be banned without exceptions. This is a scammer-free zone, and will always be!",
@@ -118,34 +123,34 @@ class Accessibility(commands.Cog):
             inline=False,
         )
         embed.set_footer(text="This bot was made by jef :)")
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await ctx.send(embed=embed, ephemeral=True)
 
-    @app_commands.command(
+    @discord.ext.commands.hybrid_command(
         name="overpay", description="Helps you calculate the proper amount of overpay"
     )
     @app_commands.describe(item_value="The numeric value of the item you want in USD")
     @app_commands.describe(percent="Percent overpay you need to get the item")
     async def slash_overpay(
-        self, interaction: discord.Interaction, item_value: float, percent: int
+        self, ctx, item_value: float, percent: int
     ):
         item_true_value = int(item_value)
         correct_percent = 1 + int(percent) / 100
         answer = item_true_value * correct_percent
         rounded_answer = round(answer, 2)
         message_response = f"The value of the items you send for a ${int(item_value)} item with {int(percent)}% overpay is ${rounded_answer} in order for you to properly overpay!"
-        await interaction.response.send_message(content=message_response)
+        await ctx.send(content=message_response)
 
-    @app_commands.command(
+    @discord.ext.commands.hybrid_command(
         name="tradingchannels", description="Tells you how to use our trading channels"
     )
     @app_commands.describe(member="The member you would like to ping")
     async def slash_tradingchannels(
-        self, interaction: discord.Interaction, member: discord.Member
+        self, ctx, member: discord.Member
     ):
         tradeEmbed = discord.Embed(
             title=f"**This is how our trading channels work!**", color=0x86DEF2
         )
-        role = interaction.guild.get_role(984591820744966184)
+        role = ctx.guild.get_role(984591820744966184)
         tradeEmbed.clear_fields()
         tradeEmbed.add_field(
             name="**What channel is for what?**",
@@ -166,13 +171,13 @@ class Accessibility(commands.Cog):
             value="**If you use the same ad for multiple channels, it will get deleted.\nEach channel should be displaying a different price range of items.**",
         )
         tradeEmbed.set_footer(text="This bot was made by jef :)")
-        await interaction.response.send_message(
+        await ctx.send(
             content=f"{member.mention}", embed=tradeEmbed
         )
 
 
-    @app_commands.command(name = "topgg", description="Sends the TopGG Server Vote link")
-    async def slash_topgg(self, interaction:discord.Interaction):
+    @discord.ext.commands.hybrid_command(name = "topgg", description="Sends the TopGG Server Vote link")
+    async def slash_topgg(self, ctx):
 
         embed = discord.Embed(title = "Vote for us on Top.gg", description = "Voting helps push our server out to more people", color = 0x86def2)
         embed.set_footer(text="Thank you for your support!")
@@ -180,7 +185,16 @@ class Accessibility(commands.Cog):
         view = TopGGButton()
         view.add_item(discord.ui.Button(label="Vote on Top.gg", style=discord.ButtonStyle.link, url = "https://top.gg/servers/953632089339727953"))
 
-        await interaction.response.send_message(embed=embed,view=view)
+        await ctx.send(embed=embed,view=view)
+
+    @discord.ext.commands.hybrid_command(name = "support", description = "Redirects you to our support channel!")
+    async def slash_support(self, ctx):
+
+        supportview = SupportButton()
+        supportview.add_item(discord.ui.Button(label = "Our Support Channel", style=discord.ButtonStyle.link, url = "https://discord.com/channels/953632089339727953/958373332321960036"))
+        support_embed = discord.Embed(title = "Have a question/concern?", description="Go to our support channel and open a ticket\nOur staff team is there to assist you.", color = 0x86def2)
+
+        await ctx.send(embed=support_embed, view=supportview)
 
 
 async def setup(bot: commands.Bot) -> None:
