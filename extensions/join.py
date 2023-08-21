@@ -13,6 +13,23 @@ class Join(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+
+        created_at = member.created_at
+        print(f"Created at: {created_at}")
+
+        age_in_hours = (discord.utils.utcnow() - created_at).total_seconds() / 3600
+        print(f"Age in hours: {age_in_hours}")
+
+        if age_in_hours < 1:
+            await member.kick()
+
+        mod_logs_channel_id = 958328194027638817
+        mod_logs_channel = self.bot.get_channel(mod_logs_channel_id)
+
+        embed = discord.Embed(title = "New Account Kicked!", description=f"I kicked {member.mention}, because their account was less than 1 hour old.")
+
+        await mod_logs_channel.send(embed=embed)
+
         channel = await self.bot.fetch_channel(953668320215830618)
         welcome_messages = [
             f"Everyone welcome {member.mention} to Traders Compound! <:3WelcomeHeart:1106629900451971226>",
