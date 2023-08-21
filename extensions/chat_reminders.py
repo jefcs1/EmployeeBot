@@ -33,20 +33,20 @@ class ChatReminders(commands.Cog):
         last_chat_reminder = discord.utils.utcnow()
         
         scam_statements = [
-            "No one accidentally reported you on steam. If someone DMs you claiming you're in risk of being banned, just ignore them.",
+            "No one accidentally reported your account on steam. If someone DMs you claiming you're in risk of being banned, just block them.",
             "Steam will never contact you via Steam chat or Discord!",
             "No legit support will ever ask for payment during the procedure... they would get paid by the company not by you.",
-            "You NEVER have to send items 'for verification', just don't send items without being 100 percent sure you'll get something in return.",
-            "Always try and find a different account for the 'Big Trader' that you're trading with, see if it's an impersonator.",
-            "All information needed can be found in the game. Don't click links to 'a site that has more information to take a screenshot' or a site that someone wants you to 'price check' on.",
+            "You NEVER have to send items 'for verification',\njust don't send items without being 100 percent sure you'll get something in return.",
+            "If you're trading with a \"Big Trader\" and their steam account isn't linked, it's probably an impersonator",
+            "Don't click links to a site that someone wants you to \"Check Prices\" on, it's an API scma website.",
             "Be extremely careful when someone offers a high amount of overpay 'because they can sell it for profit' or does not seem to care too much about which item and price range you choose, it's too good to be true.",
             "Don't believe people that are 'evading tradelock' by 'sending an item from a site directly to you' while being in a call. He will cancel the trade on his phone and you won't receive anything.",
             "Be extremely careful when someone asks you to convert your CS skins into TF2 items, usually this is a scam.",
             "Don't believe the private message saying 'you won a giveaway' or similar. These are scammers, when you win an official giveaway you have to participate",
-            "Don't click on any kind of Discord 'free Nitro' or 'Server invite'.",
+            "Don't click on any kind of Discord 'Free Nitro' or 'Server invite'.",
             "No one will contact you to play in a tournament, like in FaceIt or ESEA, and don't log into any 'tournament websites'.",
             "Steam giftcards can be charged back or bought with fraudulent credit cards which mostly brings problems",
-            "Triple Trading will **NEVER DM you on discord**."
+            "Triple Trading will **NEVER DM you on discord**.",
             "A good habit for Steam logins on trusted websites is the following:\n1.) Go to steamcommunity.com\n2.) Make sure you are logged in there\n3.) Go to the site where you want to log in\n4.) It should only require you to press login with your account with no need to enter the details once again"
         ]
 
@@ -67,7 +67,6 @@ class ChatReminders(commands.Cog):
 
 
         random_number = randint(1,200)
-        print(random_number)
         if random_number != 5:
             return
         else:
