@@ -22,11 +22,10 @@ class Join(commands.Cog):
 
         if age_in_hours < 1:
             await member.kick()
+            mod_logs_channel_id = 958328194027638817
+            mod_logs_channel = self.bot.get_channel(mod_logs_channel_id)
 
-        mod_logs_channel_id = 958328194027638817
-        mod_logs_channel = self.bot.get_channel(mod_logs_channel_id)
-
-        embed = discord.Embed(title = "New Account Kicked!", description=f"I kicked {member.mention}, because their account was less than 1 hour old.")
+            embed = discord.Embed(title = "New Account Kicked!", description=f"I kicked {member.mention}, because their account was less than 1 hour old.", color = 0xff0000)
 
         await mod_logs_channel.send(embed=embed)
 
