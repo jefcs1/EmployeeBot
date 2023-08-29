@@ -16,7 +16,7 @@ tc_trading_channels = {
     },
     "What format do I use?": {
         "title": "The trade ad format is pretty simple!",
-        "description": "The formatis:\n[H] Item\n[H] Item\n\n[W] Item\n\n*put your tradelink here*",
+        "description": "The format is:\n\n[H] Item\n[H] Item\n\n[W] Item\n\n*put your tradelink here*",
     },
 }
 
@@ -43,9 +43,11 @@ class TradesDropdown(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
-        selected_question = interaction.data["values"][0]
-        selected_title = tc_trading_channels[selected_question]["title"]
-        selected_description = tc_trading_channels[selected_question["description"]]
+        selected_value = (interaction.data["values"][0])
+        selected_question = (tc_trading_channels)[selected_value]
+        selected_title = selected_question['title']
+        selected_description = selected_question['description']
+
 
         embed = discord.Embed(
             title=f"{selected_title}",
