@@ -41,7 +41,7 @@ class Join(commands.Cog):
             f"Welcome to our community {member.mention}! <a:1TCSKELETONSPIN:1101450995776622662>",
         ]
         message = random.choice(welcome_messages)
-        await channel.send(message)
+        await channel.send(f"{message}\nTriple will **NEVER** DM you on discord.")
 
 
 async def setup(bot: commands.Bot) -> None:
