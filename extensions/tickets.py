@@ -115,7 +115,7 @@ class CloseButton(discord.ui.View):
                 read_messages=True, send_messages=True, manage_messages=True
             ),
             support_role: discord.PermissionOverwrite(
-            read_messages=True, send_messages=False
+                read_messages=True, send_messages=False
             ),
             self.opener: discord.PermissionOverwrite(
                 read_messages=True, send_messages=False
@@ -127,6 +127,7 @@ class CloseButton(discord.ui.View):
         closeEmbed = discord.Embed(
             title="Ticket Closed",
             description=f"This ticket was closed by {interaction.user.mention}\nOnly Staff Members can send messages.",
+            color=0xFF0000,
         )
         await interaction.channel.send(embed=closeEmbed, view=DeleteButton())
 
