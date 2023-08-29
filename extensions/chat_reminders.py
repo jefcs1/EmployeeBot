@@ -97,7 +97,7 @@ class ChatReminders(commands.Cog):
             color=0x86DEF2,
         )
 
-        random_number = randint(1, 750)
+        random_number = randint(1, 1500)
         if random_number == 5:
             await main_chat_object.send(embed=support_embed, view=supportview)
         elif random_number == 8:
@@ -105,6 +105,12 @@ class ChatReminders(commands.Cog):
         elif random_number == 500:
             await main_chat_object.send(embed=scam_embed)
         elif random_number == 123:
+            await main_chat_object.send(embed=scam_embed)
+        elif random_number == 1000:
+            await main_chat_object.send(embed=scam_embed)
+        elif random_number == 1245:
+            await main_chat_object.send(embed=scam_embed)
+        elif random_number == 10:
             await main_chat_object.send(embed=scam_embed)
         elif random_number == 1:
             await main_chat_object.send(embed=topgg_embed, view=topggview)
