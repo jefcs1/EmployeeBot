@@ -9,12 +9,18 @@ CREATE TABLE IF NOT EXISTS TradeAds (
     );
 
 CREATE TABLE IF NOT EXISTS Giveaways (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         prize TEXT,
         end_time TEXT,
         completed BOOLEAN DEFAULT FALSE,
         channel_id INTEGER,
-        message_id INTEGER,
-        PRIMARY KEY(channel_id, message_id)
+        message_id INTEGER
+    );
+
+CREATE TABLE IF NOT EXISTS GiveawayEntries (
+        user_id INTEGER,
+        giveaway_id INTEGER,
+        FOREIGN KEY(giveaway_id) REFERENCES giveaways(id) ON DELETE CASCADE
     );
 
 

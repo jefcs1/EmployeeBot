@@ -18,14 +18,32 @@ class HelpTypes(discord.ui.Select):
                     description="All of the information commands the bot has!",
                 ).add_field(
                     name="**Info Commands**",
-                    value="</tradingsites:1123729246146277487> -> Displays the official links of popular trading sites\n</userinfo:1123690824132218933> -> Displays information about a server member\n</serverinfo:1123692973058707591> -> Displays information about the server!\n</avatar:1123766305980424214> -> Displays a specified user's avatar\n</overpay:1123766305980424212> -> Calculates how much you need to overpay\n</rules:1123724764192723085> -> Displays the server's rules\n</tradingchannels:1123766305980424213> -> Tells a user how to use the trading channels!\n</donate:1123774312822870038> -> Lets you know how to donate to the server!\n</boost:1123690824132218931> -> Lets you know how to boost the server!",
+                    value="</tradingsites:1123729246146277487> -> Displays the official links of popular trading sites\n</userinfo:1123690824132218933> -> Displays information about a server member\n</serverinfo:1123692973058707591> -> Displays information about the server!\n</avatar:1123766305980424214> -> Displays a specified user's avatar\n</overpay:1123766305980424212> -> Calculates how much you need to overpay\n</rules:1123724764192723085> -> Displays the server's rules\n</tradingchannels:1123766305980424213> -> Tells a user how to use the trading channels!\n</donate:1123774312822870038> -> Lets you know how to donate to the server!\n</boost:1123690824132218931> -> Lets you know how to boost the server!\n</topgg:1140006715077701663> -> Sends the Top.gg Server Voting link\n</ping:1123690824132218934> -> Displays the bot's latency\n</leaderboardbumps:1140006739459190856> Shows you the users with the most bumps\n</bumps:1140006739459190855> -> Shows you 5 most recent bumps\n</nextbump:1140006739459190857> -> Tells you when the next bump is",
                     inline=False,
                 ),
             },
-            # 'Functional Commands':{
-            #     'desc': 'Displays the official Skinport website',
-            #     'embed': discord.Embed(title="Below is the official Skinport Website link", color=0x86def2).clear_fields().add_field(name="**Link**", value="https://skinport.com/", inline=False).add_field(name="**Any other Skinport links are a scam**", value="Be careful!", inline=False).set_footer(text="This bot was made by jef :)")
-            # },
+            "Functional Commands": {
+                "desc": "Displays the Bot's function-related commands",
+                "embed": discord.Embed(
+                    title="Functional Commands",
+                    description="All of the function commands the bot has!",
+                    color=0x86DEF2,
+                ).add_field(
+                    name="**Function Commands**",
+                    value="</customrole:1124462872949424279> -> Allows you to create your own custom role\n</createautopost:1125656573902065674> -> Lets you auto-post your trade advertisement",
+                ),
+            },
+            "Fun Commands": {
+                "desc": "Displays the Bot's fun commands",
+                "embed": discord.Embed(
+                    title="Fun Commands",
+                    description="All of the fun commands the bot has!",
+                    color=0x86DEF2,
+                ).add_field(
+                    name="**Fun Commands**",
+                    value="</bing:1124820390347284560> -> Chilling!",
+                ),
+            },
         }
 
         options = []
@@ -53,7 +71,6 @@ class DropdownView(discord.ui.View):
     def __init__(self):
         super().__init__()
 
-        # Adds the dropdown to our view object.
         self.add_item(HelpTypes())
 
 

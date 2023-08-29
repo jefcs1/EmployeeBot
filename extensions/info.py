@@ -2,7 +2,7 @@ import datetime
 import logging
 
 import arrow
-import discord  # type: ignore
+import discord
 from discord import app_commands
 from discord.ext import commands
 
@@ -116,7 +116,6 @@ class Info(commands.Cog):
     @app_commands.command(name="ping", description="Returns the bot's latency")
     async def slash_ping(self, interaction: discord.Interaction):
         """Pong!"""
-        # have to convert code
         latency = round(self.bot.latency * 1000)
         if latency < 250:
             color = discord.Color.blue()

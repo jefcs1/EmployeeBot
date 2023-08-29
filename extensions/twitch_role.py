@@ -11,15 +11,23 @@ class TwitchRole(commands.Cog):
         self.bot = bot
 
     live_role_id = 1122209929659428916
-    premium_role_id = 1121860722054414397
+    classified_role_id = 1121931624670580908
+    covert_role_id = 1121860931861893190
+    contraband_role_id = 1121860948370673747
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         guild = after.guild
         live_role = guild.get_role(self.live_role_id)
-        premium_role = guild.get_role(self.premium_role_id)
+        classified_role = guild.get_role(self.classified_role_id)
+        covert_role = guild.get_role(self.covert_role_id)
+        contraband_role = guild.get_role(self.contraband_role_id)
 
-        if premium_role not in after.roles:
+        if (
+            classified_role not in after.roles
+            and covert_role not in after.roles
+            and contraband_role not in after.roles
+        ):
             return
 
         if not live_role:
