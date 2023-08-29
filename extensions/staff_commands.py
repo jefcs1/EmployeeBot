@@ -45,9 +45,11 @@ class StaffCommands(commands.Cog):
         message_embed.set_author(name=interaction.user.global_name, icon_url = interaction.user.avatar)
         message_embed.set_footer(text="This message can't be replied to")
 
-        await user.send(embed=message_embed)
-
-        await interaction.response.send_message(f"Message succesfully sent to {user.name}!", ephemeral=True)
+        try:
+            await user.send(embed=message_embed)
+            await interaction.response.send_message(f"Message succesfully sent to {user.name}!", ephemeral=True)
+        except discord.Forbidden:
+            await interaction.response.send_message("I couldn't send a DM to this person", ephemeral=True)
 
 
 async def setup(bot: commands.Bot) -> None:
