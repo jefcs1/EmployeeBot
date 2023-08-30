@@ -19,6 +19,12 @@ class AutoPost(commands.Cog):
         self.logger = logging.getLogger(f"EmployeeBot.{self.__class__.__name__}")
         self.bot = bot
 
+    def cog_load(self) -> None:
+        self.posttask.start()
+
+    def cog_unload(self) -> None:
+        self.posttask.cancel()
+
     @app_commands.command(
         name="createautopost", description="Create an automatic trade advertisement!"
     )

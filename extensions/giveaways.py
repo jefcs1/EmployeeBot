@@ -173,6 +173,12 @@ class Giveaway(commands.Cog):
         self.logger = logging.getLogger(f"EmployeeBot.{self.__class__.__name__}")
         self.bot = bot
 
+    def cog_load(self) -> None:
+        self.giveaway.start()
+
+    def cog_unload(self) -> None:
+        self.giveaway.cancel()
+
     @app_commands.command(name="giveawaycreate", description="Create a Giveaway")
     @app_commands.describe(prize="Seperate items with a comma")
     @app_commands.describe(duration="How long should the giveaway last")
