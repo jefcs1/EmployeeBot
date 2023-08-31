@@ -1,5 +1,6 @@
 import logging
 import random
+import sys
 
 import discord
 from discord import app_commands
@@ -13,8 +14,14 @@ class Join(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        TESTING = sys.platform == "darwin"
+        if TESTING:
+            return
+
         created_at = member.created_at
-        print(f"Created at: {created_at}")
+
+        tc_id = 953632089339727953
+        tc_obj = self.bot.get_guild(tc_id)
 
         age_in_minutes = (discord.utils.utcnow() - created_at).total_seconds() / 60
 
@@ -42,6 +49,19 @@ class Join(commands.Cog):
         ]
         message = random.choice(welcome_messages)
         await channel.send(f"{message}\nTriple will **NEVER** DM you on discord.")
+
+        welc_embed = discord.Embed(
+            title="Welcome to Traders Compound!",
+            description="Our aim is to provide a toxicity-free community for Traders and skin-lovers alike!\nWe hope you enjoy your time with us!",
+            color=0x86DEF2,
+        )
+        welc_embed.set_author(name="Traders Compound", icon_url=tc_obj.icon.url)
+        welc_embed.add_field(
+            name="SkinFlow, instant Cash-Out for your skins.",
+            value="Traders Compound is currently partnered with SkinFlow. SkinFlow offers multiple convenient payout methods (Paypal, BTC, ETH, LTC, AdvCash) and currently offers the best rates on the market.\n[Cash Out your Skins with This Link](https://skinflow.gg/?referral=TC)",
+        )
+
+        await member.send(embed=welc_embed)
 
 
 async def setup(bot: commands.Bot) -> None:

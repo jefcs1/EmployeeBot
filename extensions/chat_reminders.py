@@ -97,7 +97,10 @@ class ChatReminders(commands.Cog):
             color=0x86DEF2,
         )
 
-        random_number = randint(1, 1500)
+        skinflow_embed=discord.Embed(title="Are you looking to cash out or trade your skins?", description="If you are looking to **instantly sell your CSGO skins** or trade your inventory for a new one, visit *Skinflow.*\n\nSkinFlow offers multiple convenient payout methods (Paypal, BTC, ETH, LTC, AdvCash) and currently offers the best rates on the market.\n\nWith code \"TC\" you can also get a 2% bonus when cashing out your skins, and support Traders Compound! <:HeartTC:1102665571872555099>\n### [Cash Out your Skins with This Link](https://skinflow.gg/?referral=TC)", color=0x86def2)
+        skinflow_embed.set_author(name="Skinflow - Cash Out your Skins", icon_url="https://cdn.discordapp.com/attachments/957350795274248292/1146798700685971518/SkinFlow_logo.png")
+
+        random_number = randint(1, 2000)
         if random_number == 5:
             await main_chat_object.send(embed=support_embed, view=supportview)
         elif random_number == 8:
@@ -108,12 +111,16 @@ class ChatReminders(commands.Cog):
             await main_chat_object.send(embed=scam_embed)
         elif random_number == 1000:
             await main_chat_object.send(embed=scam_embed)
-        elif random_number == 1245:
-            await main_chat_object.send(embed=scam_embed)
         elif random_number == 10:
             await main_chat_object.send(embed=scam_embed)
         elif random_number == 1:
             await main_chat_object.send(embed=topgg_embed, view=topggview)
+        elif random_number == 849:
+            await main_chat_object.send(embed=skinflow_embed)
+        elif random_number == 101:
+            await main_chat_object.send(embed=skinflow_embed)
+        elif random_number == 1235:
+            await main_chat_object.send(embed=skinflow_embed)
 
         time_difference = discord.utils.utcnow() - last_chat_reminder
         if time_difference > timedelta(hours=2):
