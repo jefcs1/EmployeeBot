@@ -48,7 +48,7 @@ class Join(commands.Cog):
             f"Welcome to our community {member.mention}! <a:1TCSKELETONSPIN:1101450995776622662>",
         ]
         message = random.choice(welcome_messages)
-        await channel.send(f"{message}\nTriple will **NEVER** DM you on discord.")
+        await channel.send(message)
 
         # welc_embed = discord.Embed(
         #     title="Welcome to Traders Compound!",
@@ -60,6 +60,8 @@ class Join(commands.Cog):
         #     name="SkinFlow, instant Cash-Out for your skins.",
         #     value="Traders Compound is currently partnered with SkinFlow. SkinFlow offers multiple convenient payout methods (Paypal, BTC, ETH, LTC, AdvCash) and currently offers the best rates on the market.\n[Cash Out your Skins with This Link](https://skinflow.gg/?referral=TC)",
         # )
+        # welc_embed.set_footer(text="A little note - Triple will never DM you on discord.")
+
 
         # await member.send(embed=welc_embed)
 
