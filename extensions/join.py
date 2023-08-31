@@ -50,18 +50,18 @@ class Join(commands.Cog):
         message = random.choice(welcome_messages)
         await channel.send(f"{message}\nTriple will **NEVER** DM you on discord.")
 
-        welc_embed = discord.Embed(
-            title="Welcome to Traders Compound!",
-            description="Our aim is to provide a toxicity-free community for Traders and skin-lovers alike!\nWe hope you enjoy your time with us!",
-            color=0x86DEF2,
-        )
-        welc_embed.set_author(name="Traders Compound", icon_url=tc_obj.icon.url)
-        welc_embed.add_field(
-            name="SkinFlow, instant Cash-Out for your skins.",
-            value="Traders Compound is currently partnered with SkinFlow. SkinFlow offers multiple convenient payout methods (Paypal, BTC, ETH, LTC, AdvCash) and currently offers the best rates on the market.\n[Cash Out your Skins with This Link](https://skinflow.gg/?referral=TC)",
-        )
+        # welc_embed = discord.Embed(
+        #     title="Welcome to Traders Compound!",
+        #     description="Our aim is to provide a toxicity-free community for Traders and skin-lovers alike!\nWe hope you enjoy your time with us!",
+        #     color=0x86DEF2,
+        # )
+        # welc_embed.set_author(name="Traders Compound", icon_url=tc_obj.icon.url)
+        # welc_embed.add_field(
+        #     name="SkinFlow, instant Cash-Out for your skins.",
+        #     value="Traders Compound is currently partnered with SkinFlow. SkinFlow offers multiple convenient payout methods (Paypal, BTC, ETH, LTC, AdvCash) and currently offers the best rates on the market.\n[Cash Out your Skins with This Link](https://skinflow.gg/?referral=TC)",
+        # )
 
-        await member.send(embed=welc_embed)
+        # await member.send(embed=welc_embed)
 
 
 async def setup(bot: commands.Bot) -> None:
