@@ -58,7 +58,7 @@ class Join(commands.Cog):
         # welc_embed.set_author(name="Traders Compound", icon_url=tc_obj.icon.url)
         # welc_embed.add_field(
         #     name="SkinFlow, instant Cash-Out for your skins.",
-        #     value="Traders Compound is currently partnered with SkinFlow. SkinFlow offers multiple convenient payout methods (Paypal, BTC, ETH, LTC, AdvCash) and currently offers the best rates on the market.\n[Cash Out your Skins with This Link](https://skinflow.gg/?referral=TC)",
+        #     value="Traders Compound is currently partnered with SkinFlow. SkinFlow is an instant Cashout website, with the best rates in the market.\n[Cash Out your Skins with a 2% bonus with This Link](https://skinflow.gg/?referral=TC)",
         # )
         # welc_embed.set_footer(text="A little note - Triple will never DM you on discord.")
 

@@ -42,7 +42,7 @@ class StaffCommands(commands.Cog):
         
         message_embed =discord.Embed(title="This is a Direct Message from the Traders Compound Staff:", description=f'"{message}"', color = 0x86def2)
         message_embed.add_field(name="Reason for message:", value = f"`{reason.name}`")
-        message_embed.set_author(name=interaction.user.global_name, icon_url = interaction.user.avatar)
+        message_embed.set_author(name=interaction.user.name, icon_url = interaction.user.avatar)
         message_embed.set_footer(text="This message can't be replied to")
 
         try:
