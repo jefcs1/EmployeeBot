@@ -125,7 +125,7 @@ class Bump(commands.Cog):
             row = await cursor.fetchall()
 
         if not row:
-            await interaction.response.send_message("No data recorded for this guild.")
+            await interaction.followup.send("No data recorded for this guild.")
             return
 
         text = ""
