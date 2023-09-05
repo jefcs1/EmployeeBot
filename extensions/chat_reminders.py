@@ -109,8 +109,6 @@ class ChatReminders(commands.Cog):
             await main_chat_object.send(embed=scam_embed)
         elif random_number == 123:
             await main_chat_object.send(embed=scam_embed)
-        elif random_number == 1000:
-            await main_chat_object.send(embed=scam_embed)
         elif random_number == 10:
             await main_chat_object.send(embed=scam_embed)
         elif random_number == 1:
@@ -119,8 +117,7 @@ class ChatReminders(commands.Cog):
             await main_chat_object.send(embed=skinflow_embed)
         elif random_number == 101:
             await main_chat_object.send(embed=skinflow_embed)
-        elif random_number == 1235:
-            await main_chat_object.send(embed=skinflow_embed)
+
 
         time_difference = discord.utils.utcnow() - last_chat_reminder
         if time_difference > timedelta(hours=2):
