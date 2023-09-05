@@ -38,7 +38,6 @@ class Join(commands.Cog):
             return
 
         main_chat_channel = await self.bot.fetch_channel(953668320215830618)
-        joins_channel = await self.bot.fetch_channel(1148259530375958618)
         welcome_messages = [
             f"Everyone welcome {member.mention} to Traders Compound! <:3WelcomeHeart:1106629900451971226>",
             f"Good to have you {member.mention}! <:HeartTC:1102665571872555099>",
@@ -49,7 +48,7 @@ class Join(commands.Cog):
             f"Welcome to our community {member.mention}! <a:1TCSKELETONSPIN:1101450995776622662>",
         ]
         message = random.choice(welcome_messages)
-        await joins_channel.send(message)
+        await main_chat_channel.send(message)
 
         welc_embed = discord.Embed(
             title="Welcome to Traders Compound!",
