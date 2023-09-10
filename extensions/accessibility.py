@@ -21,15 +21,14 @@ tc_trading_channels = {
 }
 
 
-class TradesDropdownView(discord.ui.View):
+class TradeChannelsPersistentView(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.add_item(TradesDropdown())
 
 
 class TradesDropdown(discord.ui.Select):
     def __init__(self):
-        super().__init__()
 
         options = []
         for label, value in tc_trading_channels.items():
@@ -40,6 +39,7 @@ class TradesDropdown(discord.ui.Select):
             min_values=1,
             max_values=1,
             options=options,
+            custom_id="persistent_view:tradingchannels",
         )
 
     async def callback(self, interaction: discord.Interaction):
@@ -83,15 +83,14 @@ tc_rules = {
 }
 
 
-class RulesDropdownView(discord.ui.View):
+class PersistentViewRules(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.add_item(RulesDropdown())
 
 
 class RulesDropdown(discord.ui.Select):
     def __init__(self):
-        super().__init__()
 
         options = []
         for label, value in tc_rules.items():
@@ -102,6 +101,7 @@ class RulesDropdown(discord.ui.Select):
             min_values=1,
             max_values=1,
             options=options,
+            custom_id="persistent_view:rules",
         )
 
     async def callback(self, interaction: discord.Interaction):
@@ -205,7 +205,7 @@ class Accessibility(commands.Cog):
             color=0x86DEF2,
         )
 
-        await ctx.send(embed=embed, view=RulesDropdownView())
+        await ctx.send(embed=embed, view=PersistentViewRules())
 
     @discord.ext.commands.hybrid_command(
         name="overpay", description="Helps you calculate the proper amount of overpay"
@@ -229,7 +229,7 @@ class Accessibility(commands.Cog):
             title="How to Use Our Trading Channels", description="", color=0x86DEF2
         )
         await ctx.send(
-            content=f"{member.mention}", embed=embed, view=TradesDropdownView()
+            content=f"{member.mention}", embed=embed, view=TradeChannelsPersistentView()
         )
 
     @discord.ext.commands.hybrid_command(

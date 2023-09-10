@@ -20,15 +20,14 @@ tradesite_links = {
 }
 
 
-class DropdownView(discord.ui.View):
+class PersistentSiteView(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.add_item(SelectSite())
 
 
 class SelectSite(discord.ui.Select):
     def __init__(self):
-        super().__init__()
 
         options = []
         for label, value in tradesite_links.items():
@@ -43,6 +42,7 @@ class SelectSite(discord.ui.Select):
             min_values=1,
             max_values=1,
             options=options,
+            custom_id="persistentview:sites"
         )
 
     async def callback(self, interaction: discord.Interaction):
@@ -68,7 +68,7 @@ class Links(commands.Cog):
         description="Gives you the official links to the most popular trading sites!",
     )
     async def slash_tradinglinks(self, interaction: discord.Interaction):
-        view = DropdownView()
+        view = PersistentSiteView()
         embed = discord.Embed(
             title="Trading Site Selection",
             description="Use the dropdown menu to view the links to the site you choose.",
