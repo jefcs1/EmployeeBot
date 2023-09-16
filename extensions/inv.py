@@ -94,82 +94,104 @@ class Inventory(commands.Cog):
 
     @commands.command()
     async def link(self, ctx, steam: Optional[str]):
-        if not steam:
-            linkEmbed = discord.Embed(
-                title="How to link your account:",
-                description="**Link command**\n`-link <steamid>`\n`-link <steam profile link>`",
-                color=0x86DEF2,
-            )
-            linkEmbed.set_author(
-                name="TC Employee Steam Verification",
-                icon_url=self.bot.user.display_avatar,
-            )
-            await ctx.send(embed=linkEmbed)
-        else:
-            id = await self.get_id(steam)
+        member=ctx.author
 
-        if id is None:
-            await ctx.send(f"{ctx.author.mention}, and Invalid Steam ID or URL was provided.")
-            return
+        async with aiosqlite.connect(DB) as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(
+                        """SELECT steam_id FROM Inventories WHERE discord_id = ?""",
+                        (member.id,),
+                    )
+            result = await cursor.fetchone()
 
-        async with aiohttp.ClientSession() as session:
-            current_profile_info = await self.get_profile_info(id, session=session)
-            if current_profile_info is None:
-                await ctx.send(f"{ctx.author.mention}, I can't get information on this profile.")
+        if result is None:
 
-        cached_profile = self.verification_cache.get(ctx.author.id)
+            if not steam:
+                linkEmbed = discord.Embed(
+                    title="How to link your account:",
+                    description="**Link command**\n`-link <steamid>`\n`-link <steam profile link>`",
+                    color=0x86DEF2,
+                )
+                linkEmbed.set_author(
+                    name="TC Employee Steam Verification",
+                    icon_url=self.bot.user.display_avatar,
+                )
+                await ctx.send(embed=linkEmbed)
+            else:
+                id = await self.get_id(steam)
 
-        if cached_profile is None:
-            self.add_to_cache(ctx.author.id, current_profile_info)
-            verifyEmbed = discord.Embed(
-                title=f"Profile: {current_profile_info.username}",
-                description=f'If this is your account please add "-TC"\nto the end of your Steam name to prove ownership.\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to change it and rerun the `!link` command.',
-                color=0x86DEF2,
-            )
-            verifyEmbed.add_field(
-                name="Not your account?",
-                value="Make sure you provided the correct Steam ID or account link.",
-            )
-            verifyEmbed.set_author(
-                name="TC Employee Steam Verification",
-                icon_url=self.bot.user.display_avatar,
-            )
-            verifyEmbed.set_thumbnail(url=current_profile_info.avatar)
-            verifyEmbed.set_footer(text="See Image Below For an Example")
+            if id is None:
+                await ctx.send(f"{ctx.author.mention}, and Invalid Steam ID or URL was provided.")
+                return
 
-            return await ctx.send(embed=verifyEmbed)
+            async with aiohttp.ClientSession() as session:
+                current_profile_info = await self.get_profile_info(id, session=session)
+                if current_profile_info is None:
+                    await ctx.send(f"{ctx.author.mention}, I can't get information on this profile.")
 
-        if cached_profile.steam_id != current_profile_info.steam_id:
-            return await ctx.send(f"{ctx.author.mention}, please use only one account while linking.")
+            cached_profile = self.verification_cache.get(ctx.author.id)
 
-        if current_profile_info.username != f"{cached_profile.username}-TC":
-            return await ctx.send(f"{ctx.author.mention}, please add '-TC' to the end of your steam name")
+            if cached_profile is None:
+                self.add_to_cache(ctx.author.id, current_profile_info)
+                verifyEmbed = discord.Embed(
+                    title=f"Profile: {current_profile_info.username}",
+                    description=f'If this is your account please add "-TC" to the end of your Steam name to prove ownership.\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to change it and rerun the `!link` command.',
+                    color=0x86DEF2,
+                )
+                verifyEmbed.add_field(
+                    name="Not your account?",
+                    value="Make sure you provided the correct Steam ID or account link.",
+                    inline=False
+                )
+                verifyEmbed.add_field(
+                    name="Not sure what to do?",
+                    value="[Click on this video to see instructions](https://fretgfr.com/u/CELNjn.mp4)",
+                    inline=False
+                )
+                verifyEmbed.set_author(
+                    name="TC Employee Steam Verification",
+                    icon_url=self.bot.user.display_avatar,
+                )
+                verifyEmbed.set_thumbnail(url=current_profile_info.avatar)
 
-        else:
-            async with aiosqlite.connect(DB) as conn:
-                cursor = await conn.cursor()
+                return await ctx.send(embed=verifyEmbed)
 
-                await cursor.execute(
-                    """INSERT INTO Inventories (discord_id, steam_id) VALUES (?, ?)""",
-                    (
-                        ctx.author.id,
-                        current_profile_info.steam_id,
-                    ),
+            if cached_profile.steam_id != current_profile_info.steam_id:
+                return await ctx.send(f"{ctx.author.mention}, please use only one account while linking.")
+
+            if current_profile_info.username != f"{cached_profile.username}-TC":
+                return await ctx.send(f"{ctx.author.mention}, please add '-TC' to the end of your steam name")
+
+            else:
+                async with aiosqlite.connect(DB) as conn:
+                    cursor = await conn.cursor()
+
+                    await cursor.execute(
+                        """INSERT INTO Inventories (discord_id, steam_id) VALUES (?, ?)""",
+                        (
+                            ctx.author.id,
+                            current_profile_info.steam_id,
+                        ),
+                    )
+
+                    await conn.commit()
+
+                successEmbed = discord.Embed(
+                    title="Verification Successful",
+                    description="You may remove TC from your steam name.\nYou may now use the `!inv` command.",
+                    color=0x86DEF2,
+                )
+                successEmbed.set_author(
+                    name="TC Employee Steam Verification",
+                    icon_url=self.bot.user.display_avatar,
                 )
 
-                await conn.commit()
-
-            successEmbed = discord.Embed(
-                title="Verification Successful",
-                description="You may remove TC from your steam name.\nYou may now use the `!inv` command.",
-                color=0x86DEF2,
-            )
-            successEmbed.set_author(
-                name="TC Employee Steam Verification",
-                icon_url=self.bot.user.display_avatar,
-            )
-
-            await ctx.send(embed=successEmbed)
+                await ctx.send(embed=successEmbed)
+                discord_id = ctx.author.id
+                self.remove_from_cache(discord_id)
+        
+        else:
+            await ctx.send(f"{ctx.author.mention}, your account is already linked!\nType `!unlink` to link a different account.")
 
     @commands.command()
     @commands.cooldown(1, 15, commands.BucketType.user)
