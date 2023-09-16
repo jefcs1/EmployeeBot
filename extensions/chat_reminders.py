@@ -1,8 +1,7 @@
-import datetime
 import logging
 import random
 import sys
-import time
+import asyncio
 from datetime import timedelta
 from random import randint
 
@@ -36,8 +35,12 @@ class ChatReminders(commands.Cog):
 
         if message.author.bot:
             return
-
+        
         last_chat_reminder = discord.utils.utcnow()
+
+        time_difference = discord.utils.utcnow() - last_chat_reminder
+        if time_difference < timedelta(minutes=10):
+            return
 
         scam_statements = [
             "No one accidentally reported your account on steam. If someone DMs you claiming you're in risk of being banned, just block them.",
@@ -119,7 +122,6 @@ class ChatReminders(commands.Cog):
             await main_chat_object.send(embed=skinflow_embed)
 
 
-        time_difference = discord.utils.utcnow() - last_chat_reminder
         if time_difference > timedelta(hours=2):
             chat_reminders = [
                 (topgg_embed, topggview),

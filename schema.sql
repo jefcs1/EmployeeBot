@@ -31,3 +31,8 @@ CREATE TABLE IF NOT EXISTS Bumps (
         user_id INTEGER,
         timestamp TEXT NOT NULL DEFAULT (datetime(CURRENT_TIMESTAMP))
     );
+
+CREATE TABLE IF NOT EXISTS Inventories (
+        discord_id INTEGER,
+        steam_id INTEGER
+    );
