@@ -173,8 +173,10 @@ class Giveaway(commands.Cog):
         self.logger = logging.getLogger(f"EmployeeBot.{self.__class__.__name__}")
         self.bot = bot
 
-    def cog_load(self) -> None:
+    async def cog_load(self) -> None:
         self.giveaway.start()
+        view = PersistentView()
+        self.bot.add_view(view)
 
     def cog_unload(self) -> None:
         self.giveaway.cancel()
