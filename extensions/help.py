@@ -6,8 +6,6 @@ import discord  # type: ignore
 from discord import app_commands
 from discord.ext import commands
 
-#link, unlink, restart, inv
-
 class HelpTypes(discord.ui.Select):
     def __init__(self):
         super().__init__()
@@ -31,7 +29,7 @@ class HelpTypes(discord.ui.Select):
                     color=0x86DEF2,
                 ).add_field(
                     name="**Function Commands**",
-                    value="</customrole:1124462872949424279> -> Allows you to create your own custom role\n</createautopost:1125656573902065674> -> Lets you auto-post your trade advertisement",
+                    value="</customrole:1124462872949424279> -> Allows you to create your own custom role\n</createautopost:1125656573902065674> -> Lets you auto-post your trade advertisement\n`!link` -> Verify ownership of your Steam Account\n`!inv` -> Checks your CSGO Inventory Value\n`!unlink` -> Allows you to unlink your Steam Account\n`!restart` -> Lets you restart the linking process if you made a mistake.",
                 ),
             },
             "Fun Commands": {
