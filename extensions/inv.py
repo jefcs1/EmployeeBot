@@ -105,7 +105,6 @@ class Inventory(commands.Cog):
             result = await cursor.fetchone()
 
         if result is None:
-
             if not steam:
                 linkEmbed = discord.Embed(
                     title="How to link your account:",
@@ -117,6 +116,7 @@ class Inventory(commands.Cog):
                     icon_url=self.bot.user.display_avatar,
                 )
                 await ctx.send(embed=linkEmbed)
+                return
             else:
                 id = await self.get_id(steam)
 
@@ -135,7 +135,7 @@ class Inventory(commands.Cog):
                 self.add_to_cache(ctx.author.id, current_profile_info)
                 verifyEmbed = discord.Embed(
                     title=f"Profile: {current_profile_info.username}",
-                    description=f'If this is your account please add "-TC" to the end of your Steam name to prove ownership.\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to change it and rerun the `!link` command.',
+                    description=f'If this is your account please add "-TC" to the end of your Steam name to prove ownership.\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to change it and rerun the same `!link` command as the one that triggered this message..',
                     color=0x86DEF2,
                 )
                 verifyEmbed.add_field(
@@ -234,6 +234,8 @@ class Inventory(commands.Cog):
                         if resp.status == 403:
                             await msg.edit(content="Your inventory is private!")
                             return
+                        if resp.status == 500:
+                            await msg.edit(content="You have no items in your inventory!\n||Poor little fucker||")
                         elif resp.status == 200:
                             data = await resp.json()
                             total_price = 0 
@@ -250,8 +252,6 @@ class Inventory(commands.Cog):
                             role_object = discord.utils.get(
                                 ctx.guild.roles, name=assigned_role
                             )
-                            if role_object not in ctx.author.roles:
-                                await ctx.author.add_roles(role_object)
 
                             invEmbed = discord.Embed(
                                 title=f"{ctx.author.display_name}'s Inventory",
@@ -268,6 +268,7 @@ class Inventory(commands.Cog):
                                     value=f"You were given the role {role_object.mention}!",
                                     inline=False,
                                 )
+                                await ctx.author.add_roles(role_object)
                             invEmbed.set_author(
                                 name="TC Employee Inventory Value",
                                 icon_url=self.bot.user.avatar,
@@ -304,6 +305,8 @@ class Inventory(commands.Cog):
                         if resp.status == 403:
                             await msg.edit(content="Your inventory is private!")
                             return
+                        if resp.status == 500:
+                            await msg.edit(content=f"{member.mention} has no items in their CSGO Inventory!")
                         elif resp.status == 200:
                             data = await resp.json()
                             total_price = 0 
