@@ -6,6 +6,7 @@ import discord  # type: ignore
 from discord import app_commands
 from discord.ext import commands
 
+#link, unlink, restart, inv
 
 class HelpTypes(discord.ui.Select):
     def __init__(self):
