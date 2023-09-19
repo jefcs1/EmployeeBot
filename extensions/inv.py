@@ -160,7 +160,7 @@ class Inventory(commands.Cog):
                 return await ctx.send(f"{ctx.author.mention}, please use only one account while linking.")
 
             if current_profile_info.username != f"{cached_profile.username}-TC":
-                return await ctx.send(f"{ctx.author.mention}, please add '-TC' to the end of your steam name")
+                return await ctx.send(f"{ctx.author.mention}, please add '-TC' to the end of the steam name you had when you first started this proccess.")
 
             else:
                 async with aiosqlite.connect(DB) as conn:
