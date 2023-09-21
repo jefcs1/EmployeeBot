@@ -261,7 +261,6 @@ class Inventory(commands.Cog):
                                 pricemedian = item.get("pricemedian", "N/A")
                                 steam_price += pricemedian
                                 name = item.get("markethashname", "N/A")
-                                highestorder = self.price_cache.get(name, {}).get("buff163", {}).get("highest_order", {}).get("price")
                                 price_cache_data = self.price_cache.get(name)
                                 if price_cache_data is not None:
                                     buff163_data = price_cache_data.get("buff163")
@@ -348,7 +347,6 @@ class Inventory(commands.Cog):
                                 pricemedian = item.get("pricemedian", "N/A")
                                 steam_price += pricemedian
                                 name = item.get("markethashname", "N/A")
-                                highestorder = self.price_cache.get(name, {}).get("buff163", {}).get("highest_order", {}).get("price")
                                 price_cache_data = self.price_cache.get(name)
                                 if price_cache_data is not None:
                                     buff163_data = price_cache_data.get("buff163")
