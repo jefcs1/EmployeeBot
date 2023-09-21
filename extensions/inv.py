@@ -1,13 +1,14 @@
+import json
 import logging
-import aiohttp
-from typing import NamedTuple, Dict, Optional, Union
-import discord
-import typing
-from PIL import Image
-import aiosqlite
-from config import DB, api_key, steamweb_apikey
 import re
-from discord.ext import commands
+from typing import Dict, NamedTuple, Optional
+
+import aiohttp
+import aiosqlite
+import discord
+from discord.ext import commands, tasks
+
+from config import DB, api_key, steamweb_apikey
 
 role_thresholds = {
     "$50": 50,
@@ -40,6 +41,23 @@ class Inventory(commands.Cog):
         self.logger = logging.getLogger(f"EmployeeBot.{self.__class__.__name__}")
         self.bot = bot
         self.verification_cache: Dict[int, ProfileInfo] = {}
+        self.price_cache = {}
+        self.refresh_cache.start()
+
+    def cog_load(self) -> None:
+        self.refresh_cache.restart()
+
+    def cog_unload(self):
+        self.refresh_cache.cancel()
+
+    @tasks.loop(hours=4.0)
+    async def refresh_cache(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://prices.csgotrader.app/latest/prices_v6.json") as resp:
+                raw_prices = await resp.text()
+                prices = json.loads(raw_prices)
+                self.price_cache = prices
+        
 
     def add_to_cache(self, discord_user_id: int, entry: ProfileInfo):
         self.verification_cache[discord_user_id] = entry
@@ -197,7 +215,8 @@ class Inventory(commands.Cog):
     @commands.cooldown(1, 15, commands.BucketType.user)
     async def inv(self, ctx, member: discord.Member = None):
         """Gets the inventory value of a Steam Account."""
-        total_price = 0
+        steam_price = 0
+        buff_price = 0
 
         if member is None:
             member = ctx.author
@@ -238,14 +257,16 @@ class Inventory(commands.Cog):
                             await msg.edit(content="You have no items in your inventory!\n||Poor little fucker||")
                         elif resp.status == 200:
                             data = await resp.json()
-                            total_price = 0 
                             for item in data:
                                 pricemedian = item.get("pricemedian", "N/A")
-                                total_price += pricemedian
+                                steam_price += pricemedian
+                                name = item.get("markethashname", "N/A")
+                                highestorder = self.price_cache.get(name, {}).get("buff163", {}).get("highest_order", {}).get("price")
+                                buff_price += highestorder
 
                         assigned_role = None
                         for role, threshold in role_thresholds.items():
-                            if total_price >= threshold:
+                            if steam_price >= threshold:
                                 assigned_role = role
 
                         if assigned_role:
@@ -259,8 +280,14 @@ class Inventory(commands.Cog):
                                 color=0x86DEF2,
                             )
                             invEmbed.add_field(
-                                name="CSGO Inventory Value",
-                                value=f"\n**{len(data)}** Items worth **${round(total_price,2)}**",
+                                name="Steam Inventory Value",
+                                value=f"\n**{len(data)}** Items worth **${round(steam_price,2)}**",
+                                inline=False
+                            )
+                            invEmbed.add_field(
+                                name="Buff163 Inventory Value",
+                                value=f"\n**{len(data)}** Items worth **${round(buff_price,2)}**",
+                                inline=False
                             )
                             if role_object not in ctx.author.roles:
                                 invEmbed.add_field(
@@ -309,10 +336,12 @@ class Inventory(commands.Cog):
                             await msg.edit(content=f"{member.mention} has no items in their CSGO Inventory!")
                         elif resp.status == 200:
                             data = await resp.json()
-                            total_price = 0 
                             for item in data:
                                 pricemedian = item.get("pricemedian", "N/A")
-                                total_price += pricemedian
+                                steam_price += pricemedian
+                                name = item.get("markethashname", "N/A")
+                                highestorder = self.price_cache.get(name, {}).get("buff163", {}).get("highest_order", {}).get("price")
+                                buff_price += highestorder
 
                             invEmbed = discord.Embed(
                                 title=f"{member.display_name}'s Inventory",
@@ -320,8 +349,14 @@ class Inventory(commands.Cog):
                                 color=0x86DEF2,
                             )
                             invEmbed.add_field(
-                                name="CSGO Inventory Value",
-                                value=f"\n**{len(data)}** Items worth **${round(total_price,2)}**",
+                                name="Steam Inventory Value",
+                                value=f"\n**{len(data)}** Items worth **${round(steam_price,2)}**",
+                                inline=False
+                            )
+                            invEmbed.add_field(
+                                name="Buff163 Inventory Value",
+                                value=f"\n**{len(data)}** Items worth **${round(buff_price,2)}**",
+                                inline=False
                             )
                             invEmbed.set_author(
                                 name="TC Employee Inventory Value",
