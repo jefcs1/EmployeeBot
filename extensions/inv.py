@@ -262,7 +262,8 @@ class Inventory(commands.Cog):
                                 steam_price += pricemedian
                                 name = item.get("markethashname", "N/A")
                                 highestorder = self.price_cache.get(name, {}).get("buff163", {}).get("highest_order", {}).get("price")
-                                buff_price += highestorder
+                                if highestorder is not None:
+                                    buff_price += highestorder
 
                         assigned_role = None
                         for role, threshold in role_thresholds.items():
@@ -341,7 +342,8 @@ class Inventory(commands.Cog):
                                 steam_price += pricemedian
                                 name = item.get("markethashname", "N/A")
                                 highestorder = self.price_cache.get(name, {}).get("buff163", {}).get("highest_order", {}).get("price")
-                                buff_price += highestorder
+                                if highestorder is not None:
+                                    buff_price += highestorder
 
                             invEmbed = discord.Embed(
                                 title=f"{member.display_name}'s Inventory",
