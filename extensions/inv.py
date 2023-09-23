@@ -126,7 +126,7 @@ class Inventory(commands.Cog):
             if not steam:
                 linkEmbed = discord.Embed(
                     title="How to link your account:",
-                    description="**Link command**\n`-link <steamid>`\n`-link <steam profile link>`",
+                    description="**Link command**\n`!link <steamid>`\n`!link <steam profile link>`",
                     color=0x86DEF2,
                 )
                 linkEmbed.set_author(
