@@ -139,7 +139,7 @@ class Inventory(commands.Cog):
                 id = await self.get_id(steam)
 
             if id is None:
-                await ctx.send(f"{ctx.author.mention}, and Invalid Steam ID or URL was provided.")
+                await ctx.send(f"{ctx.author.mention}, an Invalid Steam ID or URL was provided.")
                 return
 
             async with aiohttp.ClientSession() as session:
@@ -153,7 +153,7 @@ class Inventory(commands.Cog):
                 self.add_to_cache(ctx.author.id, current_profile_info)
                 verifyEmbed = discord.Embed(
                     title=f"Profile: {current_profile_info.username}",
-                    description=f'If this is your account please add "-TC" to the end of your Steam name to prove ownership.\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to change it and rerun the same `!link` command as the one that triggered this message..',
+                    description=f'If this is your account please add "-TC" to the end of your Steam name to prove ownership.\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to change it and rerun the same `!link` command as the one that triggered this message.\nDO NOT ADD A SPACE BETWEEN YOUR NAME AND "-TC"',
                     color=0x86DEF2,
                 )
                 verifyEmbed.add_field(
