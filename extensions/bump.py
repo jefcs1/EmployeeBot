@@ -63,12 +63,12 @@ class Bump(commands.Cog):
         await discord.utils.sleep_until(two_hours_future)
 
         embed = discord.Embed(
-            title="Bump is avaliable again!",
+            title="Bump is available again!",
             description="Please type `/bump` again!",
             color=0x86DEF2,
         )
         embed.add_field(
-            name=" Bumping will help us to stay at the top of the Counter-Strike Tags on Disboard, so that more people can find our server!.",
+            name=" Bumping will help us stay at the top of the Counter-Strike Tags on Disboard, so that more people can find our server!.",
             value="Thank you so much for your help <:HeartTC:1102665571872555099>",
         )
 
