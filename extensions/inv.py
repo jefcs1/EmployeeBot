@@ -153,8 +153,13 @@ class Inventory(commands.Cog):
                 self.add_to_cache(ctx.author.id, current_profile_info)
                 verifyEmbed = discord.Embed(
                     title=f"Profile: {current_profile_info.username}",
-                    description=f'If this is your account please add "-TC" to the end of your Steam name to prove ownership.\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to change it and rerun the same `!link` command as the one that triggered this message.\nDO NOT ADD A SPACE BETWEEN YOUR NAME AND "-TC"',
+                    description=f'Please add "-TC" to the end of your Steam name.\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to do so.',
                     color=0x86DEF2,
+                )
+                verifyEmbed.add_field(
+                    name="After you're done, rerun the same `!link` command as before",
+                    value="*Do not add a space between your name and `-TC`*",
+                    inline=False
                 )
                 verifyEmbed.add_field(
                     name="Not your account?",
