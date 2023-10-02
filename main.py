@@ -20,7 +20,7 @@ bot = commands.Bot(
     intents=discord.Intents.all(),
     help_command=None,
     status=discord.Status.online,
-    activity=discord.Activity(type=discord.ActivityType.watching, name="over TC"),
+    activity=discord.Activity(type=discord.ActivityType.watching, name="Madit"),
 )
 
 
