@@ -258,8 +258,8 @@ class Inventory(commands.Cog):
                         if resp.status == 403:
                             await msg.edit(content="Your inventory is private!")
                             return
-                        if resp.status == 500:
-                            await msg.edit(content="You have no items in your inventory!\n||Poor little fucker||")
+                        elif resp.status == 405:
+                            await msg.edit(content=f"{member.mention}, you have no items in your inventory!\n||Poor little fucker||")
                         elif resp.status == 200:
                             data = await resp.json()
                             for item in data:
@@ -345,7 +345,7 @@ class Inventory(commands.Cog):
                         if resp.status == 403:
                             await msg.edit(content="Your inventory is private!")
                             return
-                        if resp.status == 500:
+                        elif resp.status == 405:
                             await msg.edit(content=f"{member.mention} has no items in their CSGO Inventory!")
                         elif resp.status == 200:
                             data = await resp.json()
