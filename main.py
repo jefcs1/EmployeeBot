@@ -79,7 +79,7 @@ async def sync(
             synced = await ctx.bot.tree.sync(guild=ctx.guild)
         elif spec == "*":
             ctx.bot.tree.copy_global_to(guild=ctx.guild)
-            synced = await ctx.bot.tree.sync(guild=ctx.guild)
+            synced = await ctx.bot.tree.sync(guild=ctx.guild) 
         elif spec == "^":
             ctx.bot.tree.clear_commands(guild=ctx.guild)
             await ctx.bot.tree.sync(guild=ctx.guild)

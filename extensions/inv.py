@@ -281,26 +281,27 @@ class Inventory(commands.Cog):
                             if steam_price >= threshold:
                                 assigned_role = role
 
-                        if assigned_role:
+                        if assigned_role is not None:
                             role_object = discord.utils.get(
                                 ctx.guild.roles, name=assigned_role
                             )
 
-                            invEmbed = discord.Embed(
-                                title=f"{ctx.author.display_name}'s Inventory",
-                                description=f"{ctx.author.mention}",
-                                color=0x86DEF2,
-                            )
-                            invEmbed.add_field(
-                                name="Steam Inventory Value",
-                                value=f"\n**{len(data)}** Items worth **${round(steam_price,2)}**",
-                                inline=False
-                            )
-                            invEmbed.add_field(
-                                name="Buff163 Inventory Value",
-                                value=f"\n**{len(data)}** Items worth **${round(buff_price,2)}**",
-                                inline=False
-                            )
+                        invEmbed = discord.Embed(
+                            title=f"{ctx.author.display_name}'s Inventory",
+                            description=f"{ctx.author.mention}",
+                            color=0x86DEF2,
+                        )
+                        invEmbed.add_field(
+                            name="Steam Inventory Value",
+                            value=f"\n**{len(data)}** Items worth **${round(steam_price,2)}**",
+                            inline=False
+                        )
+                        invEmbed.add_field(
+                            name="Buff163 Inventory Value",
+                            value=f"\n**{len(data)}** Items worth **${round(buff_price,2)}**",
+                            inline=False
+                        )
+                        if assigned_role is not None:
                             if role_object not in ctx.author.roles:
                                 invEmbed.add_field(
                                     name="New Role",
@@ -308,12 +309,12 @@ class Inventory(commands.Cog):
                                     inline=False,
                                 )
                                 await ctx.author.add_roles(role_object)
-                            invEmbed.set_author(
-                                name="TC Employee Inventory Value",
-                                icon_url=self.bot.user.avatar,
-                            )
-                            invEmbed.set_thumbnail(url=ctx.author.avatar)
-                            await msg.edit(embed=invEmbed, content=None)
+                        invEmbed.set_author(
+                            name="TC Employee Inventory Value",
+                            icon_url=self.bot.user.avatar,
+                        )
+                        invEmbed.set_thumbnail(url=ctx.author.avatar)
+                        await msg.edit(embed=invEmbed, content=None)
 
         else:
             async with aiosqlite.connect(DB) as conn:

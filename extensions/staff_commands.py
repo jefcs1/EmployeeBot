@@ -126,5 +126,6 @@ class StaffCommands(commands.Cog):
                 "I couldn't send a DM to this person", ephemeral=True
             )
 
+
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(StaffCommands(bot))
