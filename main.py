@@ -24,7 +24,7 @@ bot = commands.Bot(
 )
 
 
-# create an on ready even
+# create an on ready event
 @bot.event
 async def on_ready():
     print(

@@ -106,6 +106,7 @@ class ChatReminders(commands.Cog):
             icon_url="https://cdn.discordapp.com/attachments/957350795274248292/1146798700685971518/SkinFlow_logo.png",
         )
 
+        random_number=0
         if self.last_reminder is not None:
             time_difference = discord.utils.utcnow() - self.last_reminder
             if time_difference > timedelta(hours=6):
@@ -128,17 +129,6 @@ class ChatReminders(commands.Cog):
             await main_chat_object.send(embed=skinflow_embed)
         elif random_number == 8:
             await main_chat_object.send(embed=skinflow_embed)
-
-        if time_difference > timedelta(hours=2):
-            chat_reminders = [
-                (topgg_embed, topggview),
-                (scam_embed, None),
-                (support_embed, supportview),
-            ]
-            chat_reminder = random.choice(chat_reminders)
-            await main_chat_object.send(embed=chat_reminder[0], view=chat_reminder[1])
-            self.last_reminder = discord.utils.utcnow()
-
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(ChatReminders(bot))

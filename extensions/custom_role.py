@@ -21,18 +21,20 @@ class CustomRoleButtons(discord.ui.View):
     async def accept_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        most_active_member_role = discord.utils.get(
-            self.guild.roles, name="Most Active Member"
+        trade_locked_role = discord.utils.get(
+            self.guild.roles, name="Trade Locked"
         )
-        if most_active_member_role:
-            hoist_position = most_active_member_role.position + 1
+        if trade_locked_role:
+            hoist_position = trade_locked_role.position - 1
+            print(hoist_position)
             await self.role.edit(position=hoist_position)
         else:
             await self.admin_channel.respond(
-                "Failed to find the 'Most Active Member' role."
+                "Failed to find the 'Trade Locked' role."
             )
-        await interaction.response.send_message(
-            content="Role Creation Successfully created!"
+        await interaction.response.edit_message(view=None)
+        await interaction.followup.send(
+            content="Role successfully created!"
         )
         await self.user.add_roles(self.role, reason="Created a custom role")
         await self.user.send("Role successfully accepted and created!")
@@ -45,18 +47,20 @@ class CustomRoleButtons(discord.ui.View):
     async def deny_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        await interaction.response.send_message(
-            content="Role Creation Successfully denied!"
+        await interaction.response.edit_message(view=None)
+        await interaction.followup.send(
+            content="Role Creation successfully denied!"
         )
-        await self.role.delete(self.role, reason="Role Denied")
+        await self.role.delete(reason="Denied")
         await self.user.send("Your role creation was denied.")
         self.value = True
+
 
     @discord.ui.button(label="Show Icon", style=discord.ButtonStyle.grey)
     async def show_avatar(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        await interaction.response.send_message(content=f"{self.icon}")
+        await interaction.response.send_message(content=f"{self.icon}", ephemeral=True)
         self.value = True
 
 
@@ -75,7 +79,7 @@ class CustomRole(commands.Cog):
         interaction: discord.Interaction,
         name: str,
         color: str,
-        icon: str = None,
+        icon: discord.Attachment = None,
         existing_role: str = None,
     ):
         await interaction.response.defer(ephemeral=True)
@@ -90,24 +94,30 @@ class CustomRole(commands.Cog):
             )
             return
 
-        # Create the custom role
         guild = interaction.guild
         permissions = discord.Permissions.none()
-        color_int = int(color, 16)  # Convert color string to integer
+        color_int = int(color, 16) 
         role = await guild.create_role(
             name=name, color=discord.Color(color_int), permissions=permissions
         )
 
-        # Set the icon for the role if provided
         if icon:
-            icon_bytes = await download_image(icon)
-            await role.edit(display_icon=icon_bytes)
+            file = await icon.read()
+            try:
+                await role.edit(display_icon=file)
+            except discord.errors.HTTPException as e:
+                if e.status == 400:
+                    await interaction.followup.send("The file is too big!")
+                    return
+                else:
+                    await interaction.followup.send("An error occurred while setting the icon.")
+                    return
 
         await interaction.followup.send(
             f"Custom role '{name}' has been sent for review!", ephemeral=True
         )
 
-        embed = discord.Embed(title="Custom Role Creation", color=0x68DEF2)
+        embed = discord.Embed(title="Custom Role Creation", color=color_int)
         embed.set_author(name=interaction.user.name, icon_url=interaction.user.avatar)
         embed.add_field(name="User", value=interaction.user.mention, inline=False)
         embed.add_field(name="Role Name", value=name, inline=False)
@@ -130,14 +140,12 @@ class CustomRole(commands.Cog):
             ),
         )
 
-
 def get_custom_role(member, existing_role_name):
     if existing_role_name:
         for role in member.roles:
             if role.name.lower() == existing_role_name.lower():
                 return role
     return None
-
 
 async def download_image(url):
     async with aiohttp.ClientSession() as session:
