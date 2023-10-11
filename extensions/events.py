@@ -14,8 +14,9 @@ class Events(commands.Cog):
     async def submit(self, interaction:discord.Interaction, attachment: discord.Attachment):
         sub_channel = self.bot.get_channel(957350795274248292)
         embed = discord.Embed(title=f"Submission from {interaction.user.display_name}:", description="", color=0x86def2)
-        await sub_channel.send(embed=embed)
-        await sub_channel.send(attachment)
+        file = await attachment.to_file()
+        embed.set_image(url=f"attachment://{file.filename}")
+        await sub_channel.send(embed=embed, file=file)
         await interaction.response.send_message("Your submission was recorded!", ephemeral=True)
 
 async def setup(bot: commands.Bot) -> None:

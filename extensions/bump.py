@@ -133,7 +133,7 @@ class Bump(commands.Cog):
         for i, row in enumerate(top_bumpers, 1):
             user_id, num_bumps = row
 
-            user = self.bot.get_user(user_id)
+            user = self.bot.fetch_user(user_id)
             text += f"{user} - {num_bumps}\n\n"
 
         draw.text((445, 490), text, (255, 255, 255), font=font)
