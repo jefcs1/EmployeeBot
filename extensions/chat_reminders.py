@@ -37,6 +37,12 @@ class ChatReminders(commands.Cog):
             time_difference = discord.utils.utcnow() - self.last_reminder
             if time_difference < timedelta(minutes=10):
                 return
+            
+        main_chat_id = 953668320215830618
+        main_chat_object = self.bot.get_channel(953668320215830618)
+        if message.channel.id != main_chat_id:
+            return
+
 
         scam_statements = [
             "No one accidentally reported your account on steam. If someone DMs you claiming you're in risk of being banned, just block them.",
@@ -74,11 +80,6 @@ class ChatReminders(commands.Cog):
             )
         )
 
-        main_chat_id = 953668320215830618
-        main_chat_object = self.bot.get_channel(953668320215830618)
-        if message.channel.id != main_chat_id:
-            return
-
         topgg_embed = discord.Embed(
             title="Vote for us on Top.gg",
             description="Voting helps push our server out to more people",
@@ -112,7 +113,9 @@ class ChatReminders(commands.Cog):
             if time_difference > timedelta(hours=6):
                 random_number = 2
             else:
-                random_number = randint(1, 2000)
+                random_number = randint(1,2000)
+        else:
+            random_number = randint(1, 2000)
         if random_number == 1:
             await main_chat_object.send(embed=support_embed, view=supportview)
         elif random_number == 2:
