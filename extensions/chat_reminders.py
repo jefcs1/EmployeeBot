@@ -35,9 +35,9 @@ class ChatReminders(commands.Cog):
 
         if self.last_reminder is not None:
             time_difference = discord.utils.utcnow() - self.last_reminder
-            if time_difference < timedelta(minutes=10):
+            if time_difference < timedelta(minutes=25):
                 return
-            
+
         main_chat_id = 953668320215830618
         main_chat_object = self.bot.get_channel(953668320215830618)
         if message.channel.id != main_chat_id:
