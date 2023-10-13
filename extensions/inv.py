@@ -347,10 +347,14 @@ class Inventory(commands.Cog):
                         params={"key": steamweb_apikey, "steam_id": steam_id},
                     ) as resp:
                         if resp.status == 403:
-                            await msg.edit(content="Your inventory is private!")
+                            await msg.edit(content=f"{member.mention}'s inventory is private!")
+                            return
+                        elif resp.status == 500:
+                            await msg.edit(content=f"There was an unexplained internal server error with the API. Please try again in a couple hours.")
                             return
                         elif resp.status == 405:
                             await msg.edit(content=f"{member.mention} has no items in their CSGO Inventory!")
+                            return
                         elif resp.status == 200:
                             data = await resp.json()
                             for item in data:
