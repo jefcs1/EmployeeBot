@@ -36,3 +36,8 @@ CREATE TABLE IF NOT EXISTS Inventories (
         discord_id INTEGER,
         steam_id INTEGER
     );
+
+CREATE TABLE IF NOT EXISTS Counting (
+        last_sender INTEGER,
+        last_number INTEGER
+    );

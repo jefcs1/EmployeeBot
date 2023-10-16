@@ -12,7 +12,7 @@ tc_trading_channels = {
     },
     "How can I get the inventory value roles?": {
         "title": "You get the inventory value role with a command",
-        "description": f"Type `-inv` in <#964253555202609162> to get the role\nOr, if the bot is not working, make sure your steam is linked to discord,\nthen contact someone on the Administration Team, and they can give you the role manually!",
+        "description": f"Type `!inv` in <#964253555202609162> to get the role\nOr, if the bot is not working, make sure your steam is linked to discord,\nthen contact someone on the Administration Team, and they can give you the role manually!",
     },
     "What format do I use?": {
         "title": "The trade ad format is pretty simple!",
