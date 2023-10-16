@@ -153,7 +153,7 @@ class Inventory(commands.Cog):
                 self.add_to_cache(ctx.author.id, current_profile_info)
                 verifyEmbed = discord.Embed(
                     title=f"Profile: {current_profile_info.username}",
-                    description=f'Please make your steam name `{current_profile_info.username}-TC`\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to do so.',
+                    description=f'Please make your steam name ```{current_profile_info.username}-TC```\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to do so.',
                     color=0x86DEF2,
                 )
                 verifyEmbed.add_field(
@@ -183,7 +183,7 @@ class Inventory(commands.Cog):
                 return await ctx.send(f"{ctx.author.mention}, please use only one account while linking.")
 
             if current_profile_info.username != f"{cached_profile.username}-TC":
-                return await ctx.send(f"{ctx.author.mention}, please make your stean name `{cached_profile.username}-TC`")
+                return await ctx.send(f"{ctx.author.mention}, please make your stean name ```{cached_profile.username}-TC```")
 
             else:
                 async with aiosqlite.connect(DB) as conn:
