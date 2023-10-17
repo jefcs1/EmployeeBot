@@ -277,6 +277,12 @@ class Inventory(commands.Cog):
                                         highest_order_data = buff163_data.get("highest_order")
                                         if highest_order_data is not None:
                                             highestorder = highest_order_data.get("price")
+                                        else:
+                                            highestorder=None
+                                    else: 
+                                        highestorder=None
+                                else:
+                                    highestorder=None
                                 if highestorder is not None:
                                     buff_price += highestorder
 
