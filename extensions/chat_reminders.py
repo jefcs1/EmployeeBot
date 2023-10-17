@@ -113,9 +113,9 @@ class ChatReminders(commands.Cog):
             if time_difference > timedelta(hours=6):
                 random_number = 2
             else:
-                random_number = randint(1,2000)
+                random_number = randint(1,5000)
         else:
-            random_number = randint(1, 2000)
+            random_number = randint(1, 5000)
         if random_number == 1:
             await main_chat_object.send(embed=support_embed, view=supportview)
         elif random_number == 2:
