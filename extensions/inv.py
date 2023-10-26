@@ -183,7 +183,7 @@ class Inventory(commands.Cog):
                 return await ctx.send(f"{ctx.author.mention}, please use only one account while linking.")
 
             if current_profile_info.username != f"{cached_profile.username}-TC":
-                return await ctx.send(f"{ctx.author.mention}, please make your stean name ```{cached_profile.username}-TC```")
+                return await ctx.send(f"{ctx.author.mention}, please make your steam name ```{cached_profile.username}-TC```")
 
             else:
                 async with aiosqlite.connect(DB) as conn:
@@ -257,9 +257,6 @@ class Inventory(commands.Cog):
                     ) as resp:
                         if resp.status == 403:
                             await msg.edit(content="Your inventory is private!")
-                            return
-                        elif resp.status == 500:
-                            await msg.edit(content=f"There was an unexplained internal server error with the API. Please try again in a couple hours.")
                             return
                         elif resp.status == 405:
                             await msg.edit(content=f"{member.mention}, you have no items in your inventory!\n||Poor little fucker||")
@@ -354,9 +351,6 @@ class Inventory(commands.Cog):
                     ) as resp:
                         if resp.status == 403:
                             await msg.edit(content=f"{member.mention}'s inventory is private!")
-                            return
-                        elif resp.status == 500:
-                            await msg.edit(content=f"There was an unexplained internal server error with the API. Please try again in a couple hours.")
                             return
                         elif resp.status == 405:
                             await msg.edit(content=f"{member.mention} has no items in their CSGO Inventory!")
