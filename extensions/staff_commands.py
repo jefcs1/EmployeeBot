@@ -129,7 +129,7 @@ class StaffCommands(commands.Cog):
     @commands.command()
     async def cleanup(self, ctx):
         def is_me(m):
-            return m.author == self.bot.user and m.content.startswith('!')
+            return m.author == self.bot.user or m.content.startswith('!')
         
         async with ctx.typing():
             deleted = await ctx.channel.purge(limit=100, check=is_me)
