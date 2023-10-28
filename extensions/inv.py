@@ -258,6 +258,9 @@ class Inventory(commands.Cog):
                         if resp.status == 403:
                             await msg.edit(content="Your inventory is private!")
                             return
+                        elif resp.status == 500:
+                            await msg.edit(content=f"There was an unexplained internal server error with the API. Please try again in a couple hours.")
+                            return
                         elif resp.status == 405:
                             await msg.edit(content=f"{member.mention}, you have no items in your inventory!\n||Poor little fucker||")
                             return
@@ -351,6 +354,9 @@ class Inventory(commands.Cog):
                     ) as resp:
                         if resp.status == 403:
                             await msg.edit(content=f"{member.mention}'s inventory is private!")
+                            return
+                        elif resp.status == 500:
+                            await msg.edit(content=f"There was an unexplained internal server error with the API. Please try again in a couple hours.")
                             return
                         elif resp.status == 405:
                             await msg.edit(content=f"{member.mention} has no items in their CSGO Inventory!")
