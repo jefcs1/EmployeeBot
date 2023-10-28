@@ -133,7 +133,7 @@ class StaffCommands(commands.Cog):
         async with ctx.typing():
             deleted = await ctx.channel.purge(limit=100, check=is_me)
             m = await ctx.channel.send(f'Deleted {len(deleted)} message(s)')
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
             await m.delete()
 
 async def setup(bot: commands.Bot) -> None:
