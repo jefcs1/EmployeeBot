@@ -252,7 +252,7 @@ class Inventory(commands.Cog):
                 msg = await ctx.send("Searching...")
                 async with aiohttp.ClientSession() as session:
                     async with session.get(
-                        "https://www.steamwebapi.com/steam/api/inventory?game=csgo&sort=price_max&currency=USD",
+                        "https://www.steamwebapi.com/steam/api/inventory?sort=price_max",
                         params={"key": steamweb_apikey, "steam_id": steam_id},
                     ) as resp:
                         if resp.status == 403:
@@ -349,7 +349,7 @@ class Inventory(commands.Cog):
 
                 async with aiohttp.ClientSession() as session:
                     async with session.get(
-                        "https://www.steamwebapi.com/steam/api/inventory?game=csgo&sort=price_max&currency=USD",
+                        "https://www.steamwebapi.com/steam/api/inventory?sort=price_max",
                         params={"key": steamweb_apikey, "steam_id": steam_id},
                     ) as resp:
                         if resp.status == 403:

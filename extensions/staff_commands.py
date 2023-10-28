@@ -125,7 +125,15 @@ class StaffCommands(commands.Cog):
             await interaction.response.send_message(
                 "I couldn't send a DM to this person", ephemeral=True
             )
-
+    
+    @commands.command()
+    async def cleanup(self, ctx):
+        def is_me(m):
+            return m.author == self.bot.user and m.content.startswith('!')
+        
+        async with ctx.typing():
+            deleted = await ctx.channel.purge(limit=100, check=is_me)
+            await ctx.channel.send(f'Deleted {len(deleted)} message(s)')
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(StaffCommands(bot))
