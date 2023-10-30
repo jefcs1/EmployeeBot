@@ -1,9 +1,10 @@
 import datetime
 import logging
+import random
 
 import discord  # type: ignore
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 tc_trading_channels = {
     "What channel is for what?": {
@@ -29,7 +30,6 @@ class TradeChannelsPersistentView(discord.ui.View):
 
 class TradesDropdown(discord.ui.Select):
     def __init__(self):
-
         options = []
         for label, value in tc_trading_channels.items():
             options.append(discord.SelectOption(label=label, value=label))
@@ -43,11 +43,10 @@ class TradesDropdown(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
-        selected_value = (interaction.data["values"][0])
+        selected_value = interaction.data["values"][0]
         selected_question = (tc_trading_channels)[selected_value]
-        selected_title = selected_question['title']
-        selected_description = selected_question['description']
-
+        selected_title = selected_question["title"]
+        selected_description = selected_question["description"]
 
         embed = discord.Embed(
             title=f"{selected_title}",
@@ -91,7 +90,6 @@ class PersistentViewRules(discord.ui.View):
 
 class RulesDropdown(discord.ui.Select):
     def __init__(self):
-
         options = []
         for label, value in tc_rules.items():
             options.append(discord.SelectOption(label=label, value=label))

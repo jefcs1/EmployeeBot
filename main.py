@@ -1,11 +1,12 @@
 import asyncio
 import logging
 import os
+import random
 import sys
 from typing import Literal, Optional
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from config import test_token, token
 
@@ -20,9 +21,19 @@ bot = commands.Bot(
     intents=discord.Intents.all(),
     help_command=None,
     status=discord.Status.online,
-    activity=discord.Activity(type=discord.ActivityType.watching, name="Madit"),
-)
+    )
 
+custom_statuses = [
+    "Don't log into unknown sites!",
+    "Beware of impersonators!",
+    "Stay safe from Scams!",
+    "Banning Peter...",
+]
+
+@tasks.loop(minutes=10)
+async def change_status():
+    new_status = random.choice(custom_statuses)
+    await bot.change_presence(activity=discord.CustomActivity(name=new_status))
 
 # create an on ready event
 @bot.event
@@ -30,6 +41,8 @@ async def on_ready():
     print(
         f"Logged in as {bot.user}\n----------------------------------------------------"
     )
+    change_status.start()
+
 
 
 handler = logging.FileHandler(
@@ -108,7 +121,6 @@ async def main() -> None:
     async with bot:
         await mass_load()
         print(await get_extensions())
-
         await bot.start(TOKEN)
 
 
