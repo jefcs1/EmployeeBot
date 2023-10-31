@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS Giveaways (
         end_time TEXT,
         completed BOOLEAN DEFAULT FALSE,
         channel_id INTEGER,
-        message_id INTEGER
+        message_id INTEGER,
+        req_roles TEXT
     );
 
 CREATE TABLE IF NOT EXISTS GiveawayEntries (

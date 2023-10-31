@@ -78,6 +78,7 @@ async def roll(
 
         winner_list = random.choice(all_entries)
         winner_element = winner_list[0]
+        await flag(message_id, channel_id)
         return winner_element
 
 
@@ -123,32 +124,44 @@ class PersistentView(discord.ui.View):
         async with aiosqlite.connect(DB) as conn:
             cursor = await conn.cursor()
             await cursor.execute(
-                """SELECT user_id FROM giveawayentries 
-                WHERE giveaway_id = (SELECT id FROM giveaways WHERE message_id = ? AND channel_id = ?) 
+                """SELECT user_id FROM GiveawayEntries 
+                WHERE giveaway_id = (SELECT id FROM Giveaways WHERE message_id = ? AND channel_id = ?) 
                 AND user_id = ?""",
                 (interaction.message.id, interaction.channel.id, interaction.user.id),
             )
             existing_entry = await cursor.fetchone()
-
             if existing_entry:
                 await interaction.response.send_message(
                     "You are already entered into this giveaway.", ephemeral=True
                 )
-                await conn.commit()
-            else:
-                await cursor.execute(
-                    """WITH gwtab AS (SELECT id FROM giveaways WHERE message_id = ? AND channel_id = ?)
-                    INSERT INTO giveawayentries (user_id, giveaway_id) VALUES (?, (SELECT id FROM gwtab))
-                    RETURNING (SELECT count(*) AS num_entries FROM giveawayentries WHERE giveaway_id = (SELECT id FROM gwtab))""",
-                    (
-                        interaction.message.id,
-                        interaction.channel.id,
-                        interaction.user.id,
-                    ),
-                )
+            await cursor.execute(
+                """SELECT req_roles FROM Giveaways WHERE message_id = ? AND channel_id = ?""",
+                (interaction.message.id, interaction.channel.id),
+            )
+            req_roles = await cursor.fetchone()
 
-                row = await cursor.fetchone()
-                await conn.commit()
+            if req_roles:
+                split_req_roles = req_roles[0].split(", ")
+                split_req_roles = [int(role_id) for role_id in split_req_roles]
+                user_role_ids = [role.id for role in interaction.user.roles]
+                if any(role_id in user_role_ids for role_id in split_req_roles):
+                    await cursor.execute(
+                        """WITH gwtab AS (SELECT id FROM Giveaways WHERE message_id = ? AND channel_id = ?)
+                        INSERT INTO GiveawayEntries (user_id, giveaway_id) VALUES (?, (SELECT id FROM gwtab))
+                        RETURNING (SELECT count(*) AS num_entries FROM GiveawayEntries WHERE giveaway_id = (SELECT id FROM gwtab))""",
+                        (
+                            interaction.message.id,
+                            interaction.channel.id,
+                            interaction.user.id,
+                        ),
+                    )
+                    row = await cursor.fetchone()
+                    await conn.commit()
+                else:
+                    await interaction.response.send_message(
+                                f"You are missing the required roles to enter the giveaway!", ephemeral=True
+                            )
+                    return
 
                 confirmationEmbed = discord.Embed(
                     title="Entry Confirmed",
@@ -185,12 +198,14 @@ class Giveaway(commands.Cog):
     @app_commands.describe(prize="Seperate items with a comma")
     @app_commands.describe(duration="How long should the giveaway last")
     @app_commands.describe(channel="The channel this giveaway should be sent in")
+    @app_commands.describe(roles="The IDs of the roles required to enter the giveaway (Seperate with a comma)")
     async def slash_giveawaycreate(
         self,
         interaction: discord.Interaction,
         prize: str,
         duration: str,
         channel: discord.TextChannel,
+        roles: str
     ):
         time = convert(duration)
         if time == -1:
@@ -220,6 +235,16 @@ class Giveaway(commands.Cog):
             value="• <@&1121931624670580908> 1 Extra Entry\n• <@&1121860931861893190> 2 Extra Entries\n• <@&1121860948370673747> 5 Extra Entries\n• Every 20 levels you get an extra entry",
             inline=False,
         )
+        if roles:
+            role_ids = roles.split(", ")
+            role_objects = [interaction.guild.get_role(int(role_id)) for role_id in role_ids if interaction.guild.get_role(int(role_id))]
+            role_mentions = [role.mention for role in role_objects]
+            role_mentions_text = '\n'.join(role_mentions)
+            GiveawayEmbed.add_field(
+                name="Required Roles:",
+                value=role_mentions_text,
+                inline=False,
+            )
         GiveawayEmbed.set_footer(text="Click the button below to enter")
 
         await interaction.response.send_message(
@@ -231,8 +256,8 @@ class Giveaway(commands.Cog):
         async with aiosqlite.connect(DB) as conn:
             cursor = await conn.cursor()
             await cursor.execute(
-                """INSERT INTO Giveaways (prize, end_time, channel_id, message_id) VALUES (?, ?, ?, ?)""",
-                (prize, end_time, channel_id, msg.id),
+                """INSERT INTO Giveaways (prize, end_time, channel_id, message_id, req_roles) VALUES (?, ?, ?, ?, ?)""",
+                (prize, end_time, channel_id, msg.id, roles),
             )
 
             await conn.commit()
@@ -280,6 +305,8 @@ class Giveaway(commands.Cog):
             return
 
         winner = await roll(message_id, channel_id, tc_guild)
+        if winner is None:
+            await channel.send("There was no winner for this giveaway!")
 
         await channel.send(
             f"Congratulations {winner.mention}, you won the {prize}! <:tc_tada:1102929530794016870>"
