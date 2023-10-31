@@ -324,7 +324,6 @@ class Inventory(commands.Cog):
                             icon_url=self.bot.user.avatar,
                         )
                         invEmbed.set_thumbnail(url=ctx.author.avatar)
-                        invEmbed.set_footer(text="Travel the shadowy night where tales of horror told,\nSeek the gateway where skins transform to gold ")
                         await msg.edit(embed=invEmbed, content=None)
 
         else:
