@@ -95,6 +95,8 @@ class Inventory(commands.Cog):
                     return None
 
                 data = await resp.json()
+                if data.get('response') == {'players': []}:
+                    return None
                 profileurl = data["response"]["players"][0]["avatarfull"]
                 profilename = data["response"]["players"][0]["personaname"]
                 return ProfileInfo(steam_id, profileurl, profilename)
@@ -145,7 +147,7 @@ class Inventory(commands.Cog):
             async with aiohttp.ClientSession() as session:
                 current_profile_info = await self.get_profile_info(id, session=session)
                 if current_profile_info is None:
-                    await ctx.send(f"{ctx.author.mention}, I can't get information on this profile.")
+                    await ctx.send(f"{ctx.author.mention}, I can't get information on this profile. Check that your Steam ID is correct.")
 
             cached_profile = self.verification_cache.get(ctx.author.id)
 
