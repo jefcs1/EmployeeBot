@@ -72,7 +72,7 @@ class Inventory(commands.Cog):
         if re.match(r"^[a-zA-Z0-9_-]+$", steam):
             return steam
 
-        match = re.search(r"(?:https?://)?steamcommunity\.com/(?:profiles/(\d+)|id/(\w+))", steam)
+        match = re.search(r"(?:https?://)?steamcommunity\.com/(?:profiles/(\d+)|id/(\w+(?:-\w+)?))", steam)
         if match:
             if match.group(1):
                 return match.group(1)
