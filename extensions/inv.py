@@ -95,7 +95,7 @@ class Inventory(commands.Cog):
                     return None
 
                 data = await resp.json()
-                if data.get('response') == {'players': []}:
+                if data == {'response': {'players': []}}:
                     return None
                 profileurl = data["response"]["players"][0]["avatarfull"]
                 profilename = data["response"]["players"][0]["personaname"]

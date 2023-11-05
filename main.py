@@ -14,9 +14,14 @@ TESTING = sys.platform == "darwin"
 TOKEN = token if not TESTING else test_token
 PREFIX = "!" if not TESTING else "t!"
 
+class MyBot(commands.Bot):
+    async def setup_hook(self):
+        change_status.start()
+        print(
+        f"Logged in as {bot.user}\n----------------------------------------------------"
+        )
 
-# initialize the bot
-bot = commands.Bot(
+bot = MyBot(
     command_prefix=PREFIX,
     intents=discord.Intents.all(),
     help_command=None,
@@ -35,21 +40,16 @@ async def change_status():
     new_status = random.choice(custom_statuses)
     await bot.change_presence(activity=discord.CustomActivity(name=new_status))
 
-# create an on ready event
-@bot.event
-async def on_ready():
-    print(
-        f"Logged in as {bot.user}\n----------------------------------------------------"
-    )
-    change_status.start()
-
-
+@change_status.before_loop
+async def before_status():
+    await bot.wait_until_ready()
 
 handler = logging.FileHandler(
     filename="logs/EmployeeBot.log", encoding="utf-8", mode="w"
 )
 discord.utils.setup_logging(handler=handler)
 logger = logging.getLogger("EmployeeBot")
+
 
 
 # get the extensions
