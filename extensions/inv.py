@@ -305,12 +305,12 @@ class Inventory(commands.Cog):
                         )
                         invEmbed.add_field(
                             name="Steam Inventory Value",
-                            value=f"\n**{len(data)}** Items worth **${round(steam_price,2)}**",
+                            value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(steam_price)}**",
                             inline=False
                         )
                         invEmbed.add_field(
                             name="Buff163 Inventory Value",
-                            value=f"\n**{len(data)}** Items worth **${round(buff_price,2)}**",
+                            value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(buff_price)}**",
                             inline=False
                         )
                         if assigned_role is not None:
@@ -386,12 +386,12 @@ class Inventory(commands.Cog):
                             )
                             invEmbed.add_field(
                                 name="Steam Inventory Value",
-                                value=f"\n**{len(data)}** Items worth **${round(steam_price,2)}**",
+                                value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(steam_price)}**",
                                 inline=False
                             )
                             invEmbed.add_field(
                                 name="Buff163 Inventory Value",
-                                value=f"\n**{len(data)}** Items worth **${round(buff_price,2)}**",
+                                value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(buff_price)}**",
                                 inline=False
                             )
                             invEmbed.set_author(
