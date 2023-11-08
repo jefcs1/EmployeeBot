@@ -290,8 +290,12 @@ class Inventory(commands.Cog):
 
                         assigned_role = None
                         for role, threshold in role_thresholds.items():
-                            if steam_price >= threshold:
-                                assigned_role = role
+                            if steam_price > buff_price:
+                                if steam_price >= threshold:
+                                    assigned_role = role
+                            else:
+                                if buff_price >= threshold:
+                                    assigned_role = role
 
                         if assigned_role is not None:
                             role_object = discord.utils.get(
