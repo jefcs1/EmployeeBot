@@ -69,9 +69,6 @@ class Inventory(commands.Cog):
             return None
 
     async def get_id(self, steam):
-        if re.match(r"^[a-zA-Z0-9_-]+$", steam):
-            return steam
-
         match = re.search(r"(?:https?://)?steamcommunity\.com/(?:profiles/(\d+)|id/(\w+(?:-\w+)?))", steam)
         if match:
             if match.group(1):
