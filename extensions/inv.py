@@ -69,16 +69,11 @@ class Inventory(commands.Cog):
             return None
 
     async def get_id(self, steam):
-        match = re.search(r"(?:https?://)?steamcommunity\.com/(?:profiles/(\d+)|id/(\w+(?:-\w+)?))", steam)
+        match = re.search(r"https?://(www\.)?(steamcommunity\.com/)(profiles/|id/)([^/]+)", steam)
         if match:
-            if match.group(1):
-                return match.group(1)
-            elif match.group(2):
-                return match.group(2)
-
-        if re.match(r"^\d+$", steam):
-            return steam
-        return None
+            return match.group(4)
+        else:
+            return None
 
     async def get_profile_info(
         self, steam_id: str, *, session: aiohttp.ClientSession

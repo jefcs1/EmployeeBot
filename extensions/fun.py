@@ -11,11 +11,13 @@ class Fun(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.logger = logging.getLogger(f"EmployeeBot.{self.__class__.__name__}")
         self.bot = bot
-#         self.lock = asyncio.Lock()
-#         self._current_number: int | None = None
-#         self._last_sender: int | None = None
+        self.lock = asyncio.Lock()
+        self._current_number: int | None = None
+        self._last_sender: int | None = None
     
 #     async def process_number(self, number, sender, message):
+#         if self._current_number is None:
+#             self._current_number=0
 #         if number == self._current_number +1: 
 #             self._current_number = number
 #             if sender != self._last_sender_id:
@@ -69,7 +71,8 @@ class Fun(commands.Cog):
 #         return self._last_sender_id # type: ignore
 
 #     async def cog_unload(self) -> None:
-#         await self.store_current_data()
+#         async with self.lock:
+#             await self.store_current_data()
     
 
 #     @app_commands.command(name="bing", description="For MaDiT")
@@ -78,7 +81,7 @@ class Fun(commands.Cog):
 
 #     @commands.Cog.listener()
 #     async def on_message(self, message):
-#         if msg.channel.id != 1157707729268392007: return
+#         if message.channel.id != 1157707729268392007: return
 #         if message.author == self.bot.user: return
         
 #         async with self.lock:
@@ -86,8 +89,7 @@ class Fun(commands.Cog):
 #                 number = int(message.content)
 #                 sender = message.author.id
 #                 if self._current_number != None:
-#                     if self._last_sender != None:
-#                         await self.process_number(number, sender, message)
+#                     if self._last_sender != None: await self.process_number(number, sender, message)
 #                     else:
 #                         Fun.current_number = number
 #                         Fun.last_sender_id = sender
