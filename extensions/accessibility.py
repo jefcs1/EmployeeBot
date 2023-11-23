@@ -16,8 +16,8 @@ tc_trading_channels = {
         "description": f"Type `!inv` in <#964253555202609162> to get the role\nOr, if the bot is not working, make sure your steam is linked to discord,\nthen contact someone on the Administration Team, and they can give you the role manually!",
     },
     "What format do I use?": {
-        "title": "The trade ad format is pretty simple!",
-        "description": "The format is:\n\n[H] Item\n[H] Item\n\n[W] Item\n\n*put your tradelink here*",
+        "title": "The trade ad format is pretty simple:",
+        "description": "[H] Item\n[H] Item\n\n[W] Item\n\n*put your tradelink here*",
     },
 }
 
