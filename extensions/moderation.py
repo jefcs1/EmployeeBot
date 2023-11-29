@@ -697,7 +697,7 @@ class Moderation(commands.Cog):
             text=f"Author ID: {message.author.id} | Message ID: {message.id}"
         )
         await messages.send(embed=md_embed)
-
+    
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Moderation(bot))

@@ -88,12 +88,10 @@ class Join(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        # TESTING = sys.platform == "darwin"
-        # if TESTING:
-        #     return
-        if member.guild != 953632089339727953:
+        
+        TESTING = sys.platform == "darwin"
+        if TESTING:
             return
-
         tc_id = 953632089339727953
         tc_obj = self.bot.get_guild(tc_id)
         leave_join = self.bot.get_channel(958327750777790465)
