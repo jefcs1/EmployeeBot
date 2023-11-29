@@ -24,11 +24,10 @@ class MyBot(commands.Bot):
 
     async def on_command_error(self, ctx, error):
         if ctx.cog:
-            if ctx.cog.has_error_handler():
-                return
-            if isinstance(error, commands.CommandNotFound): return
+            if ctx.cog.has_error_handler(): return
+        if isinstance(error, commands.CommandNotFound): return
         await ctx.send(
-            "There was an error while processing a command. My developer has been made aware."
+            "There was an error while processing this command. My developer has been made aware."
         )
         error_channel = bot.get_channel(error_channel_id)
         webhooks = await error_channel.webhooks()
