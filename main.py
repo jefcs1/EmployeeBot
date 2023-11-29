@@ -8,25 +8,45 @@ from typing import Literal, Optional
 import discord
 from discord.ext import commands, tasks
 
-from config import test_token, token
+from config import error_channel_id, test_token, token
 
 TESTING = sys.platform == "darwin"
 TOKEN = token if not TESTING else test_token
 PREFIX = "!" if not TESTING else "t!"
 
+
 class MyBot(commands.Bot):
     async def setup_hook(self):
         change_status.start()
         print(
-        f"Logged in as {bot.user}\n----------------------------------------------------"
+            f"Logged in as {bot.user}\n----------------------------------------------------"
         )
+
+    async def on_command_error(self, ctx, error):
+        if ctx.cog:
+            if ctx.cog.has_error_handler():
+                return
+            if isinstance(error, commands.CommandNotFound): return
+        await ctx.send(
+            "There was an error while processing a command. My developer has been made aware."
+        )
+        error_channel = bot.get_channel(error_channel_id)
+        webhooks = await error_channel.webhooks()
+        bot_webhook = discord.utils.get(
+            webhooks, user__id=bot.user.id
+        ) or await error_channel.create_webhook(name="Error", avatar=None)
+        await bot_webhook.send(f"{error}")
+    
+    async def on_message_edit(self, before, after):
+        await bot.process_commands(after)
+
 
 bot = MyBot(
     command_prefix=PREFIX,
     intents=discord.Intents.all(),
     help_command=None,
     status=discord.Status.online,
-    )
+)
 
 custom_statuses = [
     "Don't log into unknown sites!",
@@ -35,21 +55,23 @@ custom_statuses = [
     "Banning Peter...",
 ]
 
+
 @tasks.loop(minutes=10)
 async def change_status():
     new_status = random.choice(custom_statuses)
     await bot.change_presence(activity=discord.CustomActivity(name=new_status))
 
+
 @change_status.before_loop
 async def before_status():
     await bot.wait_until_ready()
+
 
 handler = logging.FileHandler(
     filename="logs/EmployeeBot.log", encoding="utf-8", mode="w"
 )
 discord.utils.setup_logging(handler=handler)
 logger = logging.getLogger("EmployeeBot")
-
 
 
 # get the extensions
@@ -92,7 +114,7 @@ async def sync(
             synced = await ctx.bot.tree.sync(guild=ctx.guild)
         elif spec == "*":
             ctx.bot.tree.copy_global_to(guild=ctx.guild)
-            synced = await ctx.bot.tree.sync(guild=ctx.guild) 
+            synced = await ctx.bot.tree.sync(guild=ctx.guild)
         elif spec == "^":
             ctx.bot.tree.clear_commands(guild=ctx.guild)
             await ctx.bot.tree.sync(guild=ctx.guild)

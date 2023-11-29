@@ -122,15 +122,9 @@ class ChatReminders(commands.Cog):
             await main_chat_object.send(embed=scam_embed)
         elif random_number == 3:
             await main_chat_object.send(embed=scam_embed)
-        elif random_number == 4:
-            await main_chat_object.send(embed=scam_embed)
-        elif random_number == 5:
-            await main_chat_object.send(embed=scam_embed)
         elif random_number == 6:
             await main_chat_object.send(embed=topgg_embed, view=topggview)
         elif random_number == 7:
-            await main_chat_object.send(embed=skinflow_embed)
-        elif random_number == 8:
             await main_chat_object.send(embed=skinflow_embed)
 
 async def setup(bot: commands.Bot) -> None:

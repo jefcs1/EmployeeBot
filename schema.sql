@@ -42,3 +42,17 @@ CREATE TABLE IF NOT EXISTS Counting (
         last_sender INTEGER,
         last_number INTEGER
     );
+
+CREATE TABLE IF NOT EXISTS Tempban (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        unban_time TEXT
+    );
+
+CREATE TABLE IF NOT EXISTS Warns (
+        warn_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        moderator_id INTEGER,
+        user_id INTEGER,
+        warn_reason TEXT,
+        timestamp TEXT NOT NULL DEFAULT (datetime(CURRENT_TIMESTAMP))
+    );

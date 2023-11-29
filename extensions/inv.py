@@ -73,7 +73,7 @@ class Inventory(commands.Cog):
         if match:
             return match.group(4)
         else:
-            return None
+            return steam
 
     async def get_profile_info(
         self, steam_id: str, *, session: aiohttp.ClientSession
@@ -210,9 +210,9 @@ class Inventory(commands.Cog):
         else:
             await ctx.send(f"{ctx.author.mention}, your account is already linked!\nType `!unlink` to link a different account.")
 
-    @commands.command()
+    @commands.command(aliases=["value"])
     @commands.cooldown(1, 15, commands.BucketType.user)
-    async def inv(self, ctx, member: discord.Member = None):
+    async def inv(self, ctx, member: discord.Member = None, ):
         """Gets the inventory value of a Steam Account."""
         steam_price = 0
         buff_price = 0

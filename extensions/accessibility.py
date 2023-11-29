@@ -35,7 +35,7 @@ class TradesDropdown(discord.ui.Select):
             options.append(discord.SelectOption(label=label, value=label))
 
         super().__init__(
-            placeholder="Click here to learn about our trading channels",
+            placeholder="Click here to use the menu",
             min_values=1,
             max_values=1,
             options=options,
@@ -224,7 +224,7 @@ class Accessibility(commands.Cog):
     @app_commands.describe(member="The member you would like to ping")
     async def slash_tradingchannels(self, ctx, member: discord.Member):
         embed = discord.Embed(
-            title="How to Use Our Trading Channels", description="", color=0x86DEF2
+            title="How do the Traders Compound trading channels work?", description="Use the interactive menu below to learn about our trading channels.", color=0x86DEF2
         )
         await ctx.send(
             content=f"{member.mention}", embed=embed, view=TradeChannelsPersistentView()

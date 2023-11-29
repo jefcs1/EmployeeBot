@@ -12,18 +12,48 @@ class Info(commands.Cog):
         self.logger = logging.getLogger(f"EmployeeBot.{self.__class__.__name__}")
         self.bot = bot
 
-    @app_commands.command(
-        name="userinfo", description="Gives you information on a specified user!"
-    )
-    async def slash_userinfo(
-        self, interaction: discord.Interaction, member: discord.Member
-    ):
-        if member == None:
-            member = interaction.user
+    @discord.ext.commands.hybrid_command(name="userinfo", description="Gives you information on a specified user!", aliases=["ui"])
+    async def slash_userinfo(self, ctx, user: discord.User):
+        member = None
+        
+        if ctx.guild:
+            member = ctx.guild.get_member(user.id)
+        
+        if member is None:
+            try:
+                fetched_user = await ctx.bot.fetch_user(user.id)
+                userEmbed = discord.Embed(
+                    title="User Info",
+                    description=f"{fetched_user.mention}",
+                    timestamp=datetime.datetime.now(),
+                    color=0x86DEF2,
+                )
+                userEmbed.set_author(
+                    name=f"{fetched_user.name}#{fetched_user.discriminator}", 
+                    icon_url=fetched_user.avatar
+                )
+                userEmbed.set_thumbnail(url=fetched_user.avatar)
+                userEmbed.add_field(name="**ID**", value=fetched_user.id, inline=False)
+                userEmbed.add_field(
+                    name="**Discord account creation date:**",
+                    value=f"{fetched_user.created_at.strftime('%a, %B %d, %Y, %I:%M %p')}, ({arrow.get(fetched_user.created_at).humanize()})",
+                    inline=False,
+                )
+                userEmbed.add_field(
+                    name="Roles (0)",
+                    value="User is not in the server",
+                    inline=False,
+                )
+                userEmbed.set_footer(text="This bot was made by jef :)")
+                await ctx.send(embed=userEmbed)
+            except discord.NotFound:
+                await ctx.send("User not found.")
+            return
+        
         roles = sorted(member.roles, key=lambda x: x.position, reverse=True)
         userEmbed = discord.Embed(
             title="User Info",
-            description=f"{member.mention}",
+            description=f"{user.mention}",
             timestamp=datetime.datetime.now(),
             color=0x86DEF2,
         )
@@ -38,28 +68,43 @@ class Info(commands.Cog):
             value=f"{member.created_at.strftime('%a, %B %d, %Y, %I:%M %p')}, ({arrow.get(member.created_at).humanize()})",
             inline=False,
         )
-        userEmbed.add_field(
-            name="**Server join date:**",
-            value=f"{member.joined_at.strftime('%a, %B %d, %Y, %I:%M %p')}, ({arrow.get(member.joined_at).humanize()})",
-            inline=False,
-        )
+        if member.joined_at:
+            userEmbed.add_field(
+                name="**Server join date:**",
+                value=f"{member.joined_at.strftime('%a, %B %d, %Y, %I:%M %p')}, ({arrow.get(member.joined_at).humanize()})",
+                inline=False,
+            )
+        else:
+            userEmbed.add_field(
+                name="User is not in this server.",
+                value=f"",
+                inline=False,
+            )
         if member.premium_since is not None:
             userEmbed.add_field(name="Nitro Booster?", value="Yes", inline=False)
         else:
             userEmbed.add_field(name="Nitro Booster?", value="No", inline=False)
-        userEmbed.add_field(
-            name=f"Roles ({len(roles)-1})",
-            value=", ".join(
-                [
-                    role.mention
-                    for role in roles
-                    if role != interaction.guild.default_role
-                ]
-            ),
-            inline=False,
-        )
+        if roles:
+            userEmbed.add_field(
+                name=f"Roles ({len(roles)-1})",
+                value=", ".join(
+                    [
+                        role.mention
+                        for role in roles
+                        if role != ctx.guild.default_role
+                    ]
+                ),
+                inline=False,
+            )
+        else:
+            userEmbed.add_field(
+                name="Roles (0)",
+                value="User is not in the server.",
+                inline=False
+            )
         userEmbed.set_footer(text="This bot was made by jef :)")
-        await interaction.response.send_message(embed=userEmbed)
+        await ctx.send(embed=userEmbed)
+
 
     @app_commands.command(
         name="serverinfo", description="Displays information about the server"
