@@ -26,10 +26,11 @@ def convert(time):
 
 
 class WarningView(discord.ui.View):
-    def __init__(self, info, user):
+    def __init__(self, info, user, author_id):
         super().__init__(timeout=None)
         self.info = info
         self.user = user
+        self.author_id = author_id
 
     @discord.ui.button(
         label="Delete a warning",
@@ -39,6 +40,8 @@ class WarningView(discord.ui.View):
     async def delete_warnings(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
+        if interaction.user.id != self.author_id:
+            return await interaction.response.send_message("This button is not for you", ephemeral=True)
         embed = discord.Embed(
             title=f"{len(self.info)} Warning(s) for {self.user.display_name} ({self.user.id})",
             description="Select one to delete",
@@ -232,7 +235,7 @@ class Moderation(commands.Cog):
             warningsE.add_field(
                 name=f"Moderator: {mod}", value=f"{row[1]} - {warn_time_relative}"
             )
-        await ctx.send(embed=warningsE, view=WarningView(rows, user))
+        await ctx.send(embed=warningsE, view=WarningView(rows, user, ctx.author.id))
 
     @discord.ext.commands.hybrid_command(name="mute", description="Mutes a user")
     @commands.has_any_role(
