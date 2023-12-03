@@ -8,7 +8,7 @@ from typing import Literal, Optional
 import discord
 from discord.ext import commands, tasks
 
-from config import error_channel_id, test_token, token
+from config import error_channel_id, test_token, token, webhook_url
 
 TESTING = sys.platform == "darwin"
 TOKEN = token if not TESTING else test_token
@@ -24,18 +24,16 @@ class MyBot(commands.Bot):
 
     async def on_command_error(self, ctx, error):
         if ctx.cog:
-            if ctx.cog.has_error_handler(): return
-        if isinstance(error, commands.CommandNotFound): return
+            if ctx.cog.has_error_handler():
+                return
+        if isinstance(error, commands.CommandNotFound):
+            return
         await ctx.send(
             "There was an error while processing this command. My developer has been made aware."
         )
-        error_channel = bot.get_channel(error_channel_id)
-        webhooks = await error_channel.webhooks()
-        bot_webhook = discord.utils.get(
-            webhooks, user__id=bot.user.id
-        ) or await error_channel.create_webhook(name="Error", avatar=None)
-        await bot_webhook.send(f"{error}")
-    
+        webhook = discord.Webhook.from_url(webhook_url,client=bot)
+        await webhook.send(f"{error}")
+
     async def on_message_edit(self, before, after):
         await bot.process_commands(after)
 
