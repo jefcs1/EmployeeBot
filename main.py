@@ -32,7 +32,7 @@ class MyBot(commands.Bot):
             "There was an error while processing this command. My developer has been made aware."
         )
         webhook = discord.Webhook.from_url(webhook_url,client=bot)
-        await webhook.send(f"{error}")
+        await webhook.send(f"```Error: {error}\nCommand: {ctx.command}\nAuthor: {ctx.author}```")
 
     async def on_message_edit(self, before, after):
         await bot.process_commands(after)
