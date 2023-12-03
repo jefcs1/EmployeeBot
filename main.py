@@ -5,6 +5,7 @@ import random
 import sys
 from typing import Literal, Optional
 
+import aiohttp
 import discord
 from discord.ext import commands, tasks
 
@@ -31,8 +32,9 @@ class MyBot(commands.Bot):
         await ctx.send(
             "There was an error while processing this command. My developer has been made aware."
         )
-        webhook = discord.Webhook.from_url(webhook_url,client=bot)
-        await webhook.send(f"```Error: {error}\nCommand: {ctx.command}\nAuthor: {ctx.author}```")
+        async with aiohttp.ClientSession() as session:
+            webhook = discord.Webhook.from_url(webhook_url,session=session)
+            await webhook.send(f"```Error: {error}\nCommand: {ctx.command}\nAuthor: {ctx.author}```")
 
     async def on_message_edit(self, before, after):
         await bot.process_commands(after)
