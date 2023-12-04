@@ -20,9 +20,6 @@ class Fun(commands.Cog):
     async def process_number(
         self, number: int, sender_id: discord.Member, message: discord.Message
     ):
-        if self._current_number is None:
-            self._current_number = 0
-
         if sender_id == self._last_sender_id:
             await message.delete()
             return await message.channel.send(
@@ -61,13 +58,9 @@ class Fun(commands.Cog):
             await cursor.execute("SELECT last_sender, last_number FROM Counting")
             result = await cursor.fetchone()
             await conn.commit()
-            print(result)
         if result:
             self._last_sender_id = result[0]
             self._current_number = result[1]
-        else:
-            self._last_sender_id = None
-            self._current_number = None
 
     async def store_current_data(self) -> None:
         async with aiosqlite.connect(DB) as conn:
@@ -83,7 +76,6 @@ class Fun(commands.Cog):
     async def cog_unload(self) -> None:
         async with self.lock:
             await self.store_current_data()
-            print("done")
 
     async def cog_load(self) -> None:
         async with self.lock:
@@ -115,7 +107,6 @@ class Fun(commands.Cog):
                 await self.refresh_current_data()
 
             await self.process_number(number, sender_id, message)
-
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Fun(bot))
