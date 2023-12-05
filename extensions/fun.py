@@ -67,7 +67,7 @@ class Fun(commands.Cog):
         async with aiosqlite.connect(DB) as conn:
             cursor = await conn.cursor()
             await cursor.execute(
-                """UPDATE Counting SET last_sender = ?, last_number = ?""",
+                """UPDATE Counting SET last_number = ?, last_sender = ?""",
                 (self._current_number, self._last_sender_id),
             )
             await conn.commit()
