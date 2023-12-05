@@ -13,7 +13,7 @@ from discord.ext import commands, tasks
 
 from config import (DB, admin_chat_id, admin_id, console_id, founder_id,
                     manager_id, mod_logs_id, moderator_id, server_staff_id,
-                    support_id, trial_mod_id)
+                    support_id, trial_mod_id, counting_id)
 
 
 def convert(time):
@@ -685,6 +685,8 @@ class Moderation(commands.Cog):
         if message.channel.id == admin_chat_id:
             return
         if message.channel.id == console_id:
+            return
+        if message.channel.id == counting_id:
             return
         messages = self.bot.get_channel(958327696008568892)
         md_embed = discord.Embed(
