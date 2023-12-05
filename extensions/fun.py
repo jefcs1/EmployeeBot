@@ -67,9 +67,7 @@ class Fun(commands.Cog):
         async with aiosqlite.connect(DB) as conn:
             cursor = await conn.cursor()
             await cursor.execute(
-                """INSERT INTO Counting (last_sender, last_number) VALUES (?, ?)
-                                ON CONFLICT (last_sender, channel_id) DO UPDATE
-                                SET last_sender = excluded.last_sender, last_number = excluded.last_number""",
+                """UPDATE Counting (last_sender, last_number) VALUES (?, ?)""",
                 (self._current_number, self._last_sender_id),
             )
             await conn.commit()
