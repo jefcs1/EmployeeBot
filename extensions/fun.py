@@ -104,9 +104,6 @@ class Fun(commands.Cog):
 
             sender_id = message.author.id
 
-            if self._current_number is None or self._last_sender_id is None:
-                await self.refresh_current_data()
-
             await self.process_number(number, sender_id, message)
 
 async def setup(bot: commands.Bot) -> None:
