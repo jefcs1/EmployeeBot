@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS Inventories (
     );
 
 CREATE TABLE IF NOT EXISTS Counting (
-        last_sender INTEGER DEFAULT 0,
-        last_number INTEGER DEFAULT 0
+        last_sender INTEGER,
+        last_number INTEGER
     );
 
 CREATE TABLE IF NOT EXISTS Tempban (

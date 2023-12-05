@@ -25,7 +25,8 @@ class Fun(commands.Cog):
             return await message.channel.send(
                 "You cannot send two numbers in a row", delete_after=3.0
             )
-
+        if self._current_number==None:
+            self._current_number=0
         if number != (self._current_number + 1):
             await message.delete()
             return await message.channel.send(
