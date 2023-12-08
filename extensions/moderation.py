@@ -402,7 +402,10 @@ class Moderation(commands.Cog):
         dmEmbed.add_field(
             name="You were banned for the reason:", value=f'"{ban_reason}"'
         )
-        await mem.send(embed=dmEmbed)
+        try:
+            await mem.send(embed=dmEmbed)
+        except:
+            pass
         await tc_obj.ban(obj, reason=ban_reason)
         banE = discord.Embed(
             title="", description=f"Sucessfully banned {user.mention}", color=0xFF0000
