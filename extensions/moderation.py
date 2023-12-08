@@ -379,14 +379,17 @@ class Moderation(commands.Cog):
         self, ctx, user: discord.User, *, ban_reason: str = "No reason provided."
     ):
         tc_obj = self.bot.get_guild(953632089339727953)
-        obj = discord.Object(user.id)
-        mem = await tc_obj.fetch_member(user.id)
+        try:
+            mem = await tc_obj.fetch_member(user.id)
+        except:
+            mem = None
 
-        if ctx.author.top_role <= mem.top_role:
-            await ctx.send(
-                "You can't ban someone with a role equal or higher than yours."
-            )
-            return
+        if mem:
+            if ctx.author.top_role <= mem.top_role:
+                await ctx.send(
+                    "You can't ban someone with a role equal or higher than yours."
+                )
+                return
         if user == self.bot.user or user == ctx.author:
             await ctx.send("You cannot ban this user.")
             return
@@ -406,7 +409,7 @@ class Moderation(commands.Cog):
             await mem.send(embed=dmEmbed)
         except:
             pass
-        await tc_obj.ban(obj, reason=ban_reason)
+        await tc_obj.ban(user, reason=ban_reason)
         banE = discord.Embed(
             title="", description=f"Sucessfully banned {user.mention}", color=0xFF0000
         )

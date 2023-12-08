@@ -12,7 +12,7 @@ from discord.ext import commands, tasks
 from config import error_channel_id, test_token, token, webhook_url
 
 TESTING = sys.platform == "darwin"
-TOKEN = token
+TOKEN = token if not TESTING else test_token
 PREFIX = "!" if not TESTING else "t!"
 
 
