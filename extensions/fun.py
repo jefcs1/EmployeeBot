@@ -6,7 +6,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from config import DB
+from config import DB, admin_id, manager_id, founder_id
 
 
 class Fun(commands.Cog):
@@ -16,6 +16,7 @@ class Fun(commands.Cog):
         self.lock = asyncio.Lock()
         self._current_number: int | None = None
         self._last_sender_id: int | None = None
+        self.wrong_numbers: int = 0
 
     async def process_number(
         self, number: int, sender_id: discord.Member, message: discord.Message
@@ -27,8 +28,14 @@ class Fun(commands.Cog):
             )
         if self._current_number==None:
             self._current_number=0
+        if self.wrong_numbers>=5:
+            await message.delete()
+            return await message.channel.send(
+                f"The correct number is {self._current_number+1}", delete_after=3.0
+            )
         if number != (self._current_number + 1):
             await message.delete()
+            self.wrong_numbers=self.wrong_numbers+1
             return await message.channel.send(
                 "That is not the correct number.", delete_after=3.0
             )
@@ -103,6 +110,29 @@ class Fun(commands.Cog):
             sender_id = message.author.id
 
             await self.process_number(number, sender_id, message)
+    
+    @commands.command(name="setnum", description="Sets the current info for counting to the correct info")
+    @commands.has_any_role(
+        manager_id,
+        admin_id,
+        founder_id
+    )
+    async def setnum(self, ctx):
+        channel=self.bot.get_channel(1157707729268392007)
+        async for message in channel.history(limit=1):
+            num=message.content
+            id=message.author.id
+            await Fun.cog_unload()
+            async with aiosqlite.connect(DB) as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(
+                    """UPDATE Counting SET last_number = ?, last_sender = ?""",
+                    (num, id),
+                )
+                await conn.commit()
+            await Fun.cog_load()
+            await ctx.send("Done!")
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Fun(bot))
