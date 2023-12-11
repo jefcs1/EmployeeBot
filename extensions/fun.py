@@ -122,7 +122,7 @@ class Fun(commands.Cog):
         async for message in channel.history(limit=1):
             num=message.content
             id=message.author.id
-            await Fun.cog_unload()
+            await Fun.cog_unload(self)
             async with aiosqlite.connect(DB) as conn:
                 cursor = await conn.cursor()
                 await cursor.execute(
@@ -130,7 +130,7 @@ class Fun(commands.Cog):
                     (num, id),
                 )
                 await conn.commit()
-            await Fun.cog_load()
+            await Fun.cog_load(self)
             await ctx.send("Done!")
 
 
