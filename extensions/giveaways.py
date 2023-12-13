@@ -159,8 +159,9 @@ class PersistentView(discord.ui.View):
                     await conn.commit()
                 else:
                     await interaction.response.send_message(
-                                f"You are missing the required roles to enter the giveaway!", ephemeral=True
-                            )
+                        f"You are missing the required roles to enter the giveaway!",
+                        ephemeral=True,
+                    )
                     return
 
                 confirmationEmbed = discord.Embed(
@@ -198,14 +199,16 @@ class Giveaway(commands.Cog):
     @app_commands.describe(prize="Seperate items with a comma")
     @app_commands.describe(duration="How long should the giveaway last")
     @app_commands.describe(channel="The channel this giveaway should be sent in")
-    @app_commands.describe(roles="The IDs of the roles required to enter the giveaway (Seperate with a comma)")
+    @app_commands.describe(
+        roles="The IDs of the roles required to enter the giveaway (Seperate with a comma)"
+    )
     async def slash_giveawaycreate(
         self,
         interaction: discord.Interaction,
         prize: str,
         duration: str,
         channel: discord.TextChannel,
-        roles: str
+        roles: str,
     ):
         time = convert(duration)
         if time == -1:
@@ -237,9 +240,13 @@ class Giveaway(commands.Cog):
         )
         if roles:
             role_ids = roles.split(", ")
-            role_objects = [interaction.guild.get_role(int(role_id)) for role_id in role_ids if interaction.guild.get_role(int(role_id))]
+            role_objects = [
+                interaction.guild.get_role(int(role_id))
+                for role_id in role_ids
+                if interaction.guild.get_role(int(role_id))
+            ]
             role_mentions = [role.mention for role in role_objects]
-            role_mentions_text = '\n'.join(role_mentions)
+            role_mentions_text = "\n".join(role_mentions)
             GiveawayEmbed.add_field(
                 name="Required Roles:",
                 value=role_mentions_text,

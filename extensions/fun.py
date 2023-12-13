@@ -28,17 +28,19 @@ class Fun(commands.Cog):
             )
         if self._current_number==None:
             self._current_number=0
-        if self.wrong_numbers>=5:
-            await message.delete()
-            return await message.channel.send(
-                f"The correct number is {self._current_number+1}", delete_after=3.0
-            )
         if number != (self._current_number + 1):
-            await message.delete()
-            self.wrong_numbers=self.wrong_numbers+1
-            return await message.channel.send(
-                "That is not the correct number.", delete_after=3.0
-            )
+            if self.wrong_numbers>=5:
+                await message.delete()
+                self.wrong_numbers=0
+                return await message.channel.send(
+                    f"The correct number is {self._current_number+1}", delete_after=3.0
+                )
+            else:
+                await message.delete()
+                self.wrong_numbers=self.wrong_numbers+1
+                return await message.channel.send(
+                    "That is not the correct number.", delete_after=3.0
+                )
 
         self._current_number = number
         self._last_sender_id = sender_id
