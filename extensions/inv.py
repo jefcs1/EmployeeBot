@@ -288,7 +288,6 @@ class Inventory(commands.Cog):
                             else:
                                 if buff_price >= threshold:
                                     assigned_role = role
-
                         if assigned_role is not None:
                             role_object = discord.utils.get(
                                 ctx.guild.roles, name=assigned_role

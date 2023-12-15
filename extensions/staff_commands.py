@@ -6,6 +6,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from config import founder_id, manager_id, admin_id, moderator_id, trial_mod_id, server_staff_id, support_id
 
 def convert(time):
     pos = ["s", "m", "h", "d"]
@@ -88,6 +89,15 @@ class StaffCommands(commands.Cog):
 
     @app_commands.command(
         name="message", description="Message a member with an official TC Embed"
+    )
+    @app_commands.has_any_role(
+        founder_id,
+        manager_id,
+        admin_id,
+        moderator_id,
+        trial_mod_id,
+        server_staff_id,
+        support_id,
     )
     @app_commands.describe(user="The user you want to message.")
     @app_commands.describe(message="The main message you want to send.")
