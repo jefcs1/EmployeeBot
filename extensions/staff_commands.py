@@ -6,7 +6,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from config import founder_id, manager_id, admin_id, moderator_id, trial_mod_id, server_staff_id, support_id
 
 def convert(time):
     pos = ["s", "m", "h", "d"]
@@ -87,17 +86,8 @@ class StaffCommands(commands.Cog):
         except Exception as e:
             print(e)
 
-    @discord.ext.commands.hybrid_command(
+    @app_commands.command(
         name="message", description="Message a member with an official TC Embed"
-    )
-    @app_commands.has_any_role(
-        founder_id,
-        manager_id,
-        admin_id,
-        moderator_id,
-        trial_mod_id,
-        server_staff_id,
-        support_id,
     )
     @app_commands.describe(user="The user you want to message.")
     @app_commands.describe(message="The main message you want to send.")
@@ -110,7 +100,7 @@ class StaffCommands(commands.Cog):
     )
     async def message(
         self,
-        ctx,
+        interaction: discord.Interaction,
         user: discord.Member,
         message: str,
         reason: app_commands.Choice[int],
@@ -122,17 +112,17 @@ class StaffCommands(commands.Cog):
         )
         message_embed.add_field(name="Reason for message:", value=f"`{reason.name}`")
         message_embed.set_author(
-            name=ctx.author.display_name, icon_url=ctx.author.avatar
+            name=interaction.user.display_name, icon_url=interaction.user.avatar
         )
         message_embed.set_footer(text="This message can't be replied to")
 
         try:
             await user.send(embed=message_embed)
-            await ctx.send(
+            await interaction.response.send_message(
                 f"Message succesfully sent to {user.name}!", ephemeral=True
             )
         except discord.Forbidden:
-            await ctx.send(
+            await interaction.response.send_message(
                 "I couldn't send a DM to this person", ephemeral=True
             )
     
