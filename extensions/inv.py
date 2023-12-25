@@ -6,6 +6,7 @@ from typing import Dict, NamedTuple, Optional
 import aiohttp
 import aiosqlite
 import discord
+import time
 from discord.ext import commands, tasks
 
 from config import DB, api_key, steamweb_apikey
@@ -30,12 +31,10 @@ role_thresholds = {
     "$1,000,000": 1000000,
 }
 
-
 class ProfileInfo(NamedTuple):
     steam_id: int
     avatar: str
     username: str
-
 
 class Inventory(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -43,6 +42,7 @@ class Inventory(commands.Cog):
         self.bot = bot
         self.verification_cache: Dict[int, ProfileInfo] = {}
         self.price_cache = {}
+        self.command_usage = {}
         self.refresh_cache.start()
 
     def cog_load(self) -> None:
@@ -60,7 +60,22 @@ class Inventory(commands.Cog):
                 raw_prices = await resp.text()
                 prices = json.loads(raw_prices)
                 self.price_cache = prices
+        self.clear_old_records()
 
+    def store_command_usage(self, user_id):
+        self.command_usage[user_id] = time.time()
+
+    def check_command_usage(self, user_id):
+        if user_id in self.command_usage:
+            if time.time() - self.command_usage[user_id] < 24 * 3600:
+                return 1
+        return 2
+
+    def clear_old_records(self):
+        current_time = time.time()
+        self.command_usage = {user_id: timestamp for user_id, timestamp in self.command_usage.items() 
+                            if current_time - timestamp < 24 * 3600}
+    
     def add_to_cache(self, discord_user_id: int, entry: ProfileInfo):
         self.verification_cache[discord_user_id] = entry
 
@@ -108,6 +123,58 @@ class Inventory(commands.Cog):
                 else:
                     return None
 
+    async def get_prices(self, steam_id, caching):
+        if caching == True: 
+            params = {"key": steamweb_apikey, "steam_id": steam_id}
+        else:
+            params = {"key": steamweb_apikey, "steam_id": steam_id, "no_cache": 1}
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                "https://www.steamwebapi.com/steam/api/inventory?sort=price_max",
+                params=params,
+            ) as resp:
+                status = await self.process_status(resp.status)
+                if status == 200:
+                    data=await resp.json()
+                    price = await self.add_prices(data)
+                    return price
+                else:
+                    return status
+
+    async def process_status(self, status):
+        if status == 403:
+            result = "Your inventory is private!"
+        elif status == 500:
+            result = f"There was an unexplained internal server error with the API. Please try again in a couple hours."
+        elif status == 405:
+            result = f"You have no items in your inventory!"
+        elif status == 200:
+            result = 200
+        return result
+
+    async def add_prices(self, data):
+        steam_price = 0
+        buff_price = 0
+        num = len(data)
+        for item in data:
+            pricemedian = item.get("pricemedian", "N/A")
+            steam_price += pricemedian
+            name = item.get("markethashname", "N/A")
+            item_data=self.price_cache.get(name)
+            if item_data is not None:
+                buff_data = item_data.get("buff163")
+                if buff_data is not None:
+                    starting_at = buff_data.get("starting_at")
+                    item_price = starting_at.get("price")
+                else:
+                    buff_data=None
+            else:
+                item_data=None
+            if item_price is not None:
+                buff_price += item_price
+        return round(buff_price, 2), round(steam_price, 2), num
+    
+    
     @commands.command()
     async def link(self, ctx, steam: Optional[str]):
         member = ctx.author
@@ -225,212 +292,92 @@ class Inventory(commands.Cog):
             )
 
     @commands.command(aliases=["value"])
-    @commands.cooldown(1, 15, commands.BucketType.user)
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def inv(
         self,
         ctx,
         member: discord.Member = None,
     ):
-        """Gets the inventory value of a Steam Account."""
-        steam_price = 0
-        buff_price = 0
-
         if member is None:
             member = ctx.author
 
-            async with aiosqlite.connect(DB) as conn:
-                cursor = await conn.cursor()
-
-                await cursor.execute(
-                    """SELECT steam_id FROM Inventories WHERE discord_id = ?""",
-                    (member.id,),
-                )
-                result = await cursor.fetchone()
-
-            if result is None:
-                linkEmbed = discord.Embed(
-                    title="Please link your steam account first.",
-                    description="Link your steam with `!link` first before checking your inventory value.",
-                    color=0x86DEF2,
-                )
-                linkEmbed.set_author(
-                    name="TC Employee Inventory Value",
-                    icon_url=self.bot.user.display_avatar,
-                )
-                await ctx.send(embed=linkEmbed)
-                return
-            else:
-                steam_id = result[0]
-                msg = await ctx.send("Searching...")
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(
-                        "https://www.steamwebapi.com/steam/api/inventory?sort=price_max",
-                        params={"key": steamweb_apikey, "steam_id": steam_id},
-                    ) as resp:
-                        if resp.status == 403:
-                            await msg.edit(content="Your inventory is private!")
-                            return
-                        elif resp.status == 500:
-                            await msg.edit(
-                                content=f"There was an unexplained internal server error with the API. Please try again in a couple hours."
-                            )
-                            return
-                        elif resp.status == 405:
-                            await msg.edit(
-                                content=f"{member.mention}, you have no items in your inventory!\n||Poor little fucker||"
-                            )
-                            return
-                        elif resp.status == 200:
-                            data = await resp.json()
-                            for item in data:
-                                pricemedian = item.get("pricemedian", "N/A")
-                                steam_price += pricemedian
-                                name = item.get("markethashname", "N/A")
-                                price_cache_data = self.price_cache.get(name)
-                                if price_cache_data is not None:
-                                    buff163_data = price_cache_data.get("buff163")
-                                    if buff163_data is not None:
-                                        highest_order_data = buff163_data.get(
-                                            "highest_order"
-                                        )
-                                        if highest_order_data is not None:
-                                            highestorder = highest_order_data.get(
-                                                "price"
-                                            )
-                                        else:
-                                            highestorder = None
-                                    else:
-                                        highestorder = None
-                                else:
-                                    highestorder = None
-                                if highestorder is not None:
-                                    buff_price += highestorder
-
-                        assigned_role = None
-                        for role, threshold in role_thresholds.items():
-                            if steam_price > buff_price:
-                                if steam_price >= threshold:
-                                    assigned_role = role
-                            else:
-                                if buff_price >= threshold:
-                                    assigned_role = role
-                        if assigned_role is not None:
-                            role_object = discord.utils.get(
-                                ctx.guild.roles, name=assigned_role
-                            )
-
-                        invEmbed = discord.Embed(
-                            title=f"{ctx.author.display_name}'s Inventory",
-                            description=f"{ctx.author.mention}",
-                            color=0x86DEF2,
-                        )
-                        invEmbed.add_field(
-                            name="Steam Inventory Value",
-                            value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(steam_price)}**",
-                            inline=False,
-                        )
-                        invEmbed.add_field(
-                            name="Buff163 Inventory Value",
-                            value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(buff_price)}**",
-                            inline=False,
-                        )
-                        if assigned_role is not None:
-                            if role_object not in ctx.author.roles:
-                                invEmbed.add_field(
-                                    name="New Role",
-                                    value=f"You were given the role {role_object.mention}!",
-                                    inline=False,
-                                )
-                                await ctx.author.add_roles(role_object)
-                        invEmbed.set_author(
-                            name="TC Employee Inventory Value",
-                            icon_url=self.bot.user.avatar,
-                        )
-                        invEmbed.set_thumbnail(url=ctx.author.avatar)
-                        await msg.edit(embed=invEmbed, content=None)
-
+        result = self.check_command_usage(member.id)
+        if result == 1:
+            caching=False
         else:
-            async with aiosqlite.connect(DB) as conn:
-                cursor = await conn.cursor()
+            caching=True
 
-                await cursor.execute(
-                    """SELECT steam_id FROM Inventories WHERE discord_id = ?""",
-                    (member.id,),
-                )
-                result = await cursor.fetchone()
+        async with aiosqlite.connect(DB) as conn:
+            cursor = await conn.cursor()
 
-                if result is None:
-                    FriendLinkEmbed = discord.Embed(
-                        title="Account not linked!",
-                        description=f"It seems like {member.mention} does not have an account linked with me.\nPlease ask them to link their account!",
-                        color=0x86DEF2,
-                    )
-                    await ctx.send(embed=FriendLinkEmbed)
+            await cursor.execute(
+                """SELECT steam_id FROM Inventories WHERE discord_id = ?""",
+                (member.id,),
+            )
+            result = await cursor.fetchone()
+
+        if result is None:
+            linkEmbed = discord.Embed(
+                title="Please link your steam account first.",
+                description="Link your steam with `!link` first before checking your inventory value.",
+                color=0x86DEF2,
+            )
+            linkEmbed.set_author(
+                name="TC Employee Inventory Value",
+                icon_url=self.bot.user.display_avatar,
+            )
+            await ctx.send(embed=linkEmbed)
+            return
+        else:
+            steam_id = result[0]
+        msg = await ctx.send("Searching... (This may take a while)")
+        prices = await self.get_prices(steam_id, caching)
+        if isinstance(prices[0], float) and isinstance(prices[1], float):
+            assigned_role = None
+            for role, threshold in role_thresholds.items():
+                if prices[1] > prices[0]:
+                    if prices[1] >= threshold:
+                        assigned_role = role
                 else:
-                    msg = await ctx.send("Checking Value...")
-                    steam_id = result[0]
+                    if prices[0] >= threshold:
+                        assigned_role = role
+            if assigned_role is not None:
+                role_object = discord.utils.get(
+                    ctx.guild.roles, name=assigned_role
+                )
 
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(
-                        "https://www.steamwebapi.com/steam/api/inventory?sort=price_max",
-                        params={"key": steamweb_apikey, "steam_id": steam_id},
-                    ) as resp:
-                        if resp.status == 403:
-                            await msg.edit(
-                                content=f"{member.mention}'s inventory is private!"
-                            )
-                            return
-                        elif resp.status == 500:
-                            await msg.edit(
-                                content=f"There was an unexplained internal server error with the API. Please try again in a couple hours."
-                            )
-                            return
-                        elif resp.status == 405:
-                            await msg.edit(
-                                content=f"{member.mention} has no items in their CSGO Inventory!"
-                            )
-                            return
-                        elif resp.status == 200:
-                            data = await resp.json()
-                            for item in data:
-                                pricemedian = item.get("pricemedian", "N/A")
-                                steam_price += pricemedian
-                                name = item.get("markethashname", "N/A")
-                                price_cache_data = self.price_cache.get(name)
-                                if price_cache_data is not None:
-                                    buff163_data = price_cache_data.get("buff163")
-                                    if buff163_data is not None:
-                                        highest_order_data = buff163_data.get(
-                                            "highest_order"
-                                        )
-                                        if highest_order_data is not None:
-                                            highestorder = highest_order_data.get(
-                                                "price"
-                                            )
-                                if highestorder is not None:
-                                    buff_price += highestorder
-
-                            invEmbed = discord.Embed(
-                                title=f"{member.display_name}'s Inventory",
-                                description=f"{member.mention}",
-                                color=0x86DEF2,
-                            )
-                            invEmbed.add_field(
-                                name="Steam Inventory Value",
-                                value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(steam_price)}**",
-                                inline=False,
-                            )
-                            invEmbed.add_field(
-                                name="Buff163 Inventory Value",
-                                value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(buff_price)}**",
-                                inline=False,
-                            )
-                            invEmbed.set_author(
-                                name="TC Employee Inventory Value",
-                                icon_url=self.bot.user.avatar,
-                            )
-                            invEmbed.set_thumbnail(url=member.avatar)
-                            await msg.edit(embed=invEmbed, content=None)
+            invEmbed = discord.Embed(
+                title=f"{ctx.author.display_name}'s Inventory",
+                description=f"{ctx.author.mention}",
+                color=0x86DEF2,
+            )
+            invEmbed.add_field(
+                name="Steam Inventory Value",
+                value=f"\n**{prices[2]}** Items worth **${'{:,.2f}'.format(prices[1])}**",
+                inline=False,
+            )
+            invEmbed.add_field(
+                name="Buff163 Inventory Value",
+                value=f"\n**{prices[2]}** Items worth **${'{:,.2f}'.format(prices[0])}**",
+                inline=False,
+            )
+            if assigned_role is not None:
+                if role_object not in ctx.author.roles:
+                    invEmbed.add_field(
+                        name="New Role",
+                        value=f"You were given the role {role_object.mention}!",
+                        inline=False,
+                    )
+                    await ctx.author.add_roles(role_object)
+            invEmbed.set_author(
+                name="TC Employee Inventory Value",
+                icon_url=self.bot.user.avatar,
+            )
+            invEmbed.set_thumbnail(url=ctx.author.avatar)
+            await msg.edit(embed=invEmbed, content=None)
+        else:
+            await ctx.send(content=f"{prices}")
+        self.store_command_usage(member.id)
 
     @commands.command()
     async def unlink(self, ctx):
@@ -457,7 +404,7 @@ class Inventory(commands.Cog):
     @inv.error
     async def inv_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(
+            return await ctx.send(
                 f"This command is on cooldown. Please try again in {error.retry_after:.2f} seconds."
             )
 
