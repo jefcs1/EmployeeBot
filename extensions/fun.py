@@ -26,25 +26,24 @@ class Fun(commands.Cog):
             return await message.channel.send(
                 "You cannot send two numbers in a row", delete_after=3.0
             )
-        if self._current_number==None:
-            self._current_number=0
+        if self._current_number == None:
+            self._current_number = 0
         if number != (self._current_number + 1):
-            if self.wrong_numbers>=5:
+            if self.wrong_numbers >= 5:
                 await message.delete()
-                self.wrong_numbers=0
+                self.wrong_numbers = 0
                 return await message.channel.send(
                     f"The correct number is {self._current_number+1}", delete_after=3.0
                 )
             else:
                 await message.delete()
-                self.wrong_numbers=self.wrong_numbers+1
+                self.wrong_numbers = self.wrong_numbers + 1
                 return await message.channel.send(
                     "That is not the correct number.", delete_after=3.0
                 )
 
         self._current_number = number
         self._last_sender_id = sender_id
-
         if number in [
             10,
             69,
@@ -52,6 +51,7 @@ class Fun(commands.Cog):
             420,
             500,
             1_000,
+            1_337,
             5_000,
             10_000,
             25_000,
@@ -112,18 +112,17 @@ class Fun(commands.Cog):
             sender_id = message.author.id
 
             await self.process_number(number, sender_id, message)
-    
-    @commands.command(name="setnum", description="Sets the current info for counting to the correct info")
-    @commands.has_any_role(
-        manager_id,
-        admin_id,
-        founder_id
+
+    @commands.command(
+        name="setnum",
+        description="Sets the current info for counting to the correct info",
     )
+    @commands.has_any_role(manager_id, admin_id, founder_id)
     async def setnum(self, ctx):
-        channel=self.bot.get_channel(1157707729268392007)
+        channel = self.bot.get_channel(1157707729268392007)
         async for message in channel.history(limit=1):
-            num=message.content
-            id=message.author.id
+            num = message.content
+            id = message.author.id
             await Fun.cog_unload(self)
             async with aiosqlite.connect(DB) as conn:
                 cursor = await conn.cursor()

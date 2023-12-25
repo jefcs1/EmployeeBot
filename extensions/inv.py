@@ -23,6 +23,7 @@ role_thresholds = {
     "$10,000": 10000,
     "$25,000": 25000,
     "$50,000": 50000,
+    "$75,000": 75000,
     "$100,000": 100000,
     "$250,000": 250000,
     "$500,000": 500000,
@@ -53,11 +54,12 @@ class Inventory(commands.Cog):
     @tasks.loop(hours=4.0)
     async def refresh_cache(self):
         async with aiohttp.ClientSession() as session:
-            async with session.get("https://prices.csgotrader.app/latest/prices_v6.json") as resp:
+            async with session.get(
+                "https://prices.csgotrader.app/latest/prices_v6.json"
+            ) as resp:
                 raw_prices = await resp.text()
                 prices = json.loads(raw_prices)
                 self.price_cache = prices
-        
 
     def add_to_cache(self, discord_user_id: int, entry: ProfileInfo):
         self.verification_cache[discord_user_id] = entry
@@ -69,7 +71,9 @@ class Inventory(commands.Cog):
             return None
 
     async def get_id(self, steam):
-        match = re.search(r"https?://(www\.)?(steamcommunity\.com/)(profiles/|id/)([^/]+)", steam)
+        match = re.search(
+            r"https?://(www\.)?(steamcommunity\.com/)(profiles/|id/)([^/]+)", steam
+        )
         if match:
             return match.group(4)
         else:
@@ -87,7 +91,7 @@ class Inventory(commands.Cog):
                     return None
 
                 data = await resp.json()
-                if data == {'response': {'players': []}}:
+                if data == {"response": {"players": []}}:
                     return None
                 profileurl = data["response"]["players"][0]["avatarfull"]
                 profilename = data["response"]["players"][0]["personaname"]
@@ -98,7 +102,7 @@ class Inventory(commands.Cog):
                 params={"key": api_key, "vanityurl": steam_id},
             ) as resp:
                 data = await resp.json()
-                if 'response' in data and data['response'].get('success', 0) == 1:
+                if "response" in data and data["response"].get("success", 0) == 1:
                     steam_id = data["response"]["steamid"]
                     return await self.get_profile_info(steam_id, session=session)
                 else:
@@ -106,14 +110,14 @@ class Inventory(commands.Cog):
 
     @commands.command()
     async def link(self, ctx, steam: Optional[str]):
-        member=ctx.author
+        member = ctx.author
 
         async with aiosqlite.connect(DB) as conn:
             cursor = await conn.cursor()
             await cursor.execute(
-                        """SELECT steam_id FROM Inventories WHERE discord_id = ?""",
-                        (member.id,),
-                    )
+                """SELECT steam_id FROM Inventories WHERE discord_id = ?""",
+                (member.id,),
+            )
             result = await cursor.fetchone()
 
         if result is None:
@@ -133,13 +137,17 @@ class Inventory(commands.Cog):
                 id = await self.get_id(steam)
 
             if id is None:
-                await ctx.send(f"{ctx.author.mention}, an Invalid Steam ID or URL was provided.")
+                await ctx.send(
+                    f"{ctx.author.mention}, an Invalid Steam ID or URL was provided."
+                )
                 return
 
             async with aiohttp.ClientSession() as session:
                 current_profile_info = await self.get_profile_info(id, session=session)
                 if current_profile_info is None:
-                    await ctx.send(f"{ctx.author.mention}, I can't get information on this profile. Check that your Steam ID is correct.")
+                    await ctx.send(
+                        f"{ctx.author.mention}, I can't get information on this profile. Check that your Steam ID is correct."
+                    )
 
             cached_profile = self.verification_cache.get(ctx.author.id)
 
@@ -147,23 +155,23 @@ class Inventory(commands.Cog):
                 self.add_to_cache(ctx.author.id, current_profile_info)
                 verifyEmbed = discord.Embed(
                     title=f"Profile: {current_profile_info.username}",
-                    description=f'Please make your steam name ```{current_profile_info.username}-TC```\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to do so.',
+                    description=f"Please make your steam name ```{current_profile_info.username}-TC```\n[Click Here](https://steamcommunity.com/profiles/{current_profile_info.steam_id}/edit) to do so.",
                     color=0x86DEF2,
                 )
                 verifyEmbed.add_field(
                     name="After you're done, rerun the same `!link` command as before",
                     value="*Do not add a space between your name and `-TC`*",
-                    inline=False
+                    inline=False,
                 )
                 verifyEmbed.add_field(
                     name="Not your account?",
                     value="Make sure you provided the correct Steam ID or account link.",
-                    inline=False
+                    inline=False,
                 )
                 verifyEmbed.add_field(
                     name="Not sure what to do?",
                     value="[Click on this video to see instructions](https://fretgfr.com/u/CELNjn.mp4)",
-                    inline=False
+                    inline=False,
                 )
                 verifyEmbed.set_author(
                     name="TC Employee Steam Verification",
@@ -174,10 +182,14 @@ class Inventory(commands.Cog):
                 return await ctx.send(embed=verifyEmbed)
 
             if cached_profile.steam_id != current_profile_info.steam_id:
-                return await ctx.send(f"{ctx.author.mention}, please use only one account while linking.")
+                return await ctx.send(
+                    f"{ctx.author.mention}, please use only one account while linking."
+                )
 
             if current_profile_info.username != f"{cached_profile.username}-TC":
-                return await ctx.send(f"{ctx.author.mention}, please make your steam name ```{cached_profile.username}-TC```")
+                return await ctx.send(
+                    f"{ctx.author.mention}, please make your steam name ```{cached_profile.username}-TC```"
+                )
 
             else:
                 async with aiosqlite.connect(DB) as conn:
@@ -206,13 +218,19 @@ class Inventory(commands.Cog):
                 await ctx.send(embed=successEmbed)
                 discord_id = ctx.author.id
                 self.remove_from_cache(discord_id)
-        
+
         else:
-            await ctx.send(f"{ctx.author.mention}, your account is already linked!\nType `!unlink` to link a different account.")
+            await ctx.send(
+                f"{ctx.author.mention}, your account is already linked!\nType `!unlink` to link a different account."
+            )
 
     @commands.command(aliases=["value"])
     @commands.cooldown(1, 15, commands.BucketType.user)
-    async def inv(self, ctx, member: discord.Member = None, ):
+    async def inv(
+        self,
+        ctx,
+        member: discord.Member = None,
+    ):
         """Gets the inventory value of a Steam Account."""
         steam_price = 0
         buff_price = 0
@@ -233,7 +251,7 @@ class Inventory(commands.Cog):
                 linkEmbed = discord.Embed(
                     title="Please link your steam account first.",
                     description="Link your steam with `!link` first before checking your inventory value.",
-                    color=0x86def2,
+                    color=0x86DEF2,
                 )
                 linkEmbed.set_author(
                     name="TC Employee Inventory Value",
@@ -253,10 +271,14 @@ class Inventory(commands.Cog):
                             await msg.edit(content="Your inventory is private!")
                             return
                         elif resp.status == 500:
-                            await msg.edit(content=f"There was an unexplained internal server error with the API. Please try again in a couple hours.")
+                            await msg.edit(
+                                content=f"There was an unexplained internal server error with the API. Please try again in a couple hours."
+                            )
                             return
                         elif resp.status == 405:
-                            await msg.edit(content=f"{member.mention}, you have no items in your inventory!\n||Poor little fucker||")
+                            await msg.edit(
+                                content=f"{member.mention}, you have no items in your inventory!\n||Poor little fucker||"
+                            )
                             return
                         elif resp.status == 200:
                             data = await resp.json()
@@ -268,15 +290,19 @@ class Inventory(commands.Cog):
                                 if price_cache_data is not None:
                                     buff163_data = price_cache_data.get("buff163")
                                     if buff163_data is not None:
-                                        highest_order_data = buff163_data.get("highest_order")
+                                        highest_order_data = buff163_data.get(
+                                            "highest_order"
+                                        )
                                         if highest_order_data is not None:
-                                            highestorder = highest_order_data.get("price")
+                                            highestorder = highest_order_data.get(
+                                                "price"
+                                            )
                                         else:
-                                            highestorder=None
-                                    else: 
-                                        highestorder=None
+                                            highestorder = None
+                                    else:
+                                        highestorder = None
                                 else:
-                                    highestorder=None
+                                    highestorder = None
                                 if highestorder is not None:
                                     buff_price += highestorder
 
@@ -301,12 +327,12 @@ class Inventory(commands.Cog):
                         invEmbed.add_field(
                             name="Steam Inventory Value",
                             value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(steam_price)}**",
-                            inline=False
+                            inline=False,
                         )
                         invEmbed.add_field(
                             name="Buff163 Inventory Value",
                             value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(buff_price)}**",
-                            inline=False
+                            inline=False,
                         )
                         if assigned_role is not None:
                             if role_object not in ctx.author.roles:
@@ -342,7 +368,7 @@ class Inventory(commands.Cog):
                     await ctx.send(embed=FriendLinkEmbed)
                 else:
                     msg = await ctx.send("Checking Value...")
-                    steam_id=result[0]
+                    steam_id = result[0]
 
                 async with aiohttp.ClientSession() as session:
                     async with session.get(
@@ -350,13 +376,19 @@ class Inventory(commands.Cog):
                         params={"key": steamweb_apikey, "steam_id": steam_id},
                     ) as resp:
                         if resp.status == 403:
-                            await msg.edit(content=f"{member.mention}'s inventory is private!")
+                            await msg.edit(
+                                content=f"{member.mention}'s inventory is private!"
+                            )
                             return
                         elif resp.status == 500:
-                            await msg.edit(content=f"There was an unexplained internal server error with the API. Please try again in a couple hours.")
+                            await msg.edit(
+                                content=f"There was an unexplained internal server error with the API. Please try again in a couple hours."
+                            )
                             return
                         elif resp.status == 405:
-                            await msg.edit(content=f"{member.mention} has no items in their CSGO Inventory!")
+                            await msg.edit(
+                                content=f"{member.mention} has no items in their CSGO Inventory!"
+                            )
                             return
                         elif resp.status == 200:
                             data = await resp.json()
@@ -368,9 +400,13 @@ class Inventory(commands.Cog):
                                 if price_cache_data is not None:
                                     buff163_data = price_cache_data.get("buff163")
                                     if buff163_data is not None:
-                                        highest_order_data = buff163_data.get("highest_order")
+                                        highest_order_data = buff163_data.get(
+                                            "highest_order"
+                                        )
                                         if highest_order_data is not None:
-                                            highestorder = highest_order_data.get("price")
+                                            highestorder = highest_order_data.get(
+                                                "price"
+                                            )
                                 if highestorder is not None:
                                     buff_price += highestorder
 
@@ -382,12 +418,12 @@ class Inventory(commands.Cog):
                             invEmbed.add_field(
                                 name="Steam Inventory Value",
                                 value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(steam_price)}**",
-                                inline=False
+                                inline=False,
                             )
                             invEmbed.add_field(
                                 name="Buff163 Inventory Value",
                                 value=f"\n**{len(data)}** Items worth **${'{:,.2f}'.format(buff_price)}**",
-                                inline=False
+                                inline=False,
                             )
                             invEmbed.set_author(
                                 name="TC Employee Inventory Value",
@@ -421,7 +457,10 @@ class Inventory(commands.Cog):
     @inv.error
     async def inv_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.")
+            await ctx.send(
+                f"This command is on cooldown. Please try again in {error.retry_after:.2f} seconds."
+            )
+
 
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(Inventory(bot))

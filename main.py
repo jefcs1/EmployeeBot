@@ -22,8 +22,9 @@ class MyBot(commands.Bot):
         print(
             f"Logged in as {bot.user}\n----------------------------------------------------"
         )
-
     async def on_command_error(self, ctx, error):
+        if TESTING:
+            return
         if ctx.cog:
             if ctx.cog.has_error_handler():
                 return
