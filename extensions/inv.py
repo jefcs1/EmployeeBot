@@ -298,8 +298,10 @@ class Inventory(commands.Cog):
         ctx,
         member: discord.Member = None,
     ):
+        for_other = True
         if member is None:
             member = ctx.author
+            for_other = False
 
         result = self.check_command_usage(member.id)
         if result == 1:
@@ -334,21 +336,21 @@ class Inventory(commands.Cog):
         prices = await self.get_prices(steam_id, caching)
         if isinstance(prices[0], float) and isinstance(prices[1], float):
             assigned_role = None
-            for role, threshold in role_thresholds.items():
-                if prices[1] > prices[0]:
-                    if prices[1] >= threshold:
-                        assigned_role = role
-                else:
-                    if prices[0] >= threshold:
-                        assigned_role = role
-            if assigned_role is not None:
-                role_object = discord.utils.get(
-                    ctx.guild.roles, name=assigned_role
-                )
-
+            if for_other == True:
+                for role, threshold in role_thresholds.items():
+                    if prices[1] > prices[0]:
+                        if prices[1] >= threshold:
+                            assigned_role = role
+                    else:
+                        if prices[0] >= threshold:
+                            assigned_role = role
+                if assigned_role is not None:
+                    role_object = discord.utils.get(
+                        ctx.guild.roles, name=assigned_role
+                    )
             invEmbed = discord.Embed(
-                title=f"{ctx.author.display_name}'s Inventory",
-                description=f"{ctx.author.mention}",
+                title=f"{member.display_name}'s Inventory",
+                description=f"{member.mention}",
                 color=0x86DEF2,
             )
             invEmbed.add_field(
@@ -368,12 +370,12 @@ class Inventory(commands.Cog):
                         value=f"You were given the role {role_object.mention}!",
                         inline=False,
                     )
-                    await ctx.author.add_roles(role_object)
+                    await member.add_roles(role_object)
             invEmbed.set_author(
                 name="TC Employee Inventory Value",
                 icon_url=self.bot.user.avatar,
             )
-            invEmbed.set_thumbnail(url=ctx.author.avatar)
+            invEmbed.set_thumbnail(url=member.avatar)
             await msg.edit(embed=invEmbed, content=None)
         else:
             await ctx.send(content=f"{prices}")
