@@ -31,10 +31,12 @@ role_thresholds = {
     "$1,000,000": 1000000,
 }
 
+
 class ProfileInfo(NamedTuple):
     steam_id: int
     avatar: str
     username: str
+
 
 class Inventory(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -73,9 +75,12 @@ class Inventory(commands.Cog):
 
     def clear_old_records(self):
         current_time = time.time()
-        self.command_usage = {user_id: timestamp for user_id, timestamp in self.command_usage.items() 
-                            if current_time - timestamp < 24 * 3600}
-    
+        self.command_usage = {
+            user_id: timestamp
+            for user_id, timestamp in self.command_usage.items()
+            if current_time - timestamp < 24 * 3600
+        }
+
     def add_to_cache(self, discord_user_id: int, entry: ProfileInfo):
         self.verification_cache[discord_user_id] = entry
 
@@ -124,7 +129,7 @@ class Inventory(commands.Cog):
                     return None
 
     async def get_prices(self, steam_id, caching):
-        if caching == True: 
+        if caching == True:
             params = {"key": steamweb_apikey, "steam_id": steam_id}
         else:
             params = {"key": steamweb_apikey, "steam_id": steam_id, "no_cache": 1}
@@ -135,7 +140,7 @@ class Inventory(commands.Cog):
             ) as resp:
                 status = await self.process_status(resp.status)
                 if status == 200:
-                    data=await resp.json()
+                    data = await resp.json()
                     price = await self.add_prices(data)
                     return price
                 else:
@@ -160,21 +165,20 @@ class Inventory(commands.Cog):
             pricemedian = item.get("pricemedian", "N/A")
             steam_price += pricemedian
             name = item.get("markethashname", "N/A")
-            item_data=self.price_cache.get(name)
+            item_data = self.price_cache.get(name)
             if item_data is not None:
                 buff_data = item_data.get("buff163")
                 if buff_data is not None:
                     starting_at = buff_data.get("starting_at")
                     item_price = starting_at.get("price")
                 else:
-                    buff_data=None
+                    buff_data = None
             else:
-                item_data=None
+                item_data = None
             if item_price is not None:
                 buff_price += item_price
         return round(buff_price, 2), round(steam_price, 2), num
-    
-    
+
     @commands.command()
     async def link(self, ctx, steam: Optional[str]):
         member = ctx.author
@@ -305,9 +309,9 @@ class Inventory(commands.Cog):
 
         result = self.check_command_usage(member.id)
         if result == 1:
-            caching=False
+            caching = False
         else:
-            caching=True
+            caching = True
 
         async with aiosqlite.connect(DB) as conn:
             cursor = await conn.cursor()
@@ -336,7 +340,7 @@ class Inventory(commands.Cog):
         prices = await self.get_prices(steam_id, caching)
         if isinstance(prices[0], float) and isinstance(prices[1], float):
             assigned_role = None
-            if for_other == True:
+            if for_other == False:
                 for role, threshold in role_thresholds.items():
                     if prices[1] > prices[0]:
                         if prices[1] >= threshold:
@@ -345,9 +349,7 @@ class Inventory(commands.Cog):
                         if prices[0] >= threshold:
                             assigned_role = role
                 if assigned_role is not None:
-                    role_object = discord.utils.get(
-                        ctx.guild.roles, name=assigned_role
-                    )
+                    role_object = discord.utils.get(ctx.guild.roles, name=assigned_role)
             invEmbed = discord.Embed(
                 title=f"{member.display_name}'s Inventory",
                 description=f"{member.mention}",
