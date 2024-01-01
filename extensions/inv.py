@@ -216,7 +216,7 @@ class Inventory(commands.Cog):
             async with aiohttp.ClientSession() as session:
                 current_profile_info = await self.get_profile_info(id, session=session)
                 if current_profile_info is None:
-                    await ctx.send(
+                    return await ctx.send(
                         f"{ctx.author.mention}, I can't get information on this profile. Check that your Steam ID is correct."
                     )
 
@@ -291,7 +291,7 @@ class Inventory(commands.Cog):
                 self.remove_from_cache(discord_id)
 
         else:
-            await ctx.send(
+            return await ctx.send(
                 f"{ctx.author.mention}, your account is already linked!\nType `!unlink` to link a different account."
             )
 
