@@ -412,6 +412,10 @@ class Inventory(commands.Cog):
             return await ctx.send(
                 f"This command is on cooldown. Please try again in {error.retry_after:.2f} seconds."
             )
+        if isinstance(error, commands.MemberNotFound):
+            return await ctx.send(
+                f"I can't find the member that you mentioned!\nIf you are trying to use the inventory command, use `!inv`. If you are trying to use the link command, use `!link <profile>`"
+            )
 
 
 async def setup(bot: commands.Bot) -> None:

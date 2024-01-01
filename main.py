@@ -22,11 +22,14 @@ class MyBot(commands.Bot):
         print(
             f"Logged in as {bot.user}\n----------------------------------------------------"
         )
+
     async def on_command_error(self, ctx, error):
         if TESTING:
             return
         if ctx.cog:
             if ctx.cog.has_error_handler():
+                return
+            if ctx.has_error_handler():
                 return
         if isinstance(error, commands.CommandNotFound):
             return
@@ -34,8 +37,10 @@ class MyBot(commands.Bot):
             "There was an error while processing this command. My developer has been made aware."
         )
         async with aiohttp.ClientSession() as session:
-            webhook = discord.Webhook.from_url(webhook_url,session=session)
-            await webhook.send(f"```Error: {error}\nCommand: {ctx.command}\nAuthor: {ctx.author}```")
+            webhook = discord.Webhook.from_url(webhook_url, session=session)
+            await webhook.send(
+                f"```Error: {error}\nCommand: {ctx.command}\nAuthor: {ctx.author}```"
+            )
 
     async def on_message_edit(self, before, after):
         await bot.process_commands(after)
