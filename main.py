@@ -29,7 +29,7 @@ class MyBot(commands.Bot):
         if ctx.cog:
             if ctx.cog.has_error_handler():
                 return
-            if ctx.has_error_handler():
+            if ctx.command.has_error_handler():
                 return
         if isinstance(error, commands.CommandNotFound):
             return
