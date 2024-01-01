@@ -291,6 +291,7 @@ class Moderation(commands.Cog):
         log_embed.add_field(name="User", value=f"{user.mention}")
         log_embed.add_field(name="Moderator", value=f"{ctx.author.mention}")
         log_embed.add_field(name="Reason", value=f"{mute_reason}")
+        log_embed.add_field(name="Duration", value=f"{mute_time}")
         log_embed.set_footer(text=f"ID: {user.id}")
         await ctx.message.delete()
         msg = await ctx.send(embed=muteE)

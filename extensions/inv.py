@@ -381,6 +381,7 @@ class Inventory(commands.Cog):
             await msg.edit(embed=invEmbed, content=None)
         else:
             await ctx.send(content=f"{prices}")
+            return
         self.store_command_usage(member.id)
 
     @commands.command()

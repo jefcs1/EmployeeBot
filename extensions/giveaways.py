@@ -314,6 +314,8 @@ class Giveaway(commands.Cog):
         winner = await roll(message_id, channel_id, tc_guild)
         if winner is None:
             await channel.send("There was no winner for this giveaway!")
+            flag(message_id, channel_id)
+            return
 
         await channel.send(
             f"Congratulations {winner.mention}, you won the {prize}! <:tc_tada:1102929530794016870>"
