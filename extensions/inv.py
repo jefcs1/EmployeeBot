@@ -168,7 +168,7 @@ class Inventory(commands.Cog):
             buff_data = self.price_cache.get(name)
             starting_at = buff_data.get("starting_at")
             item_price = starting_at.get("price")
-            if item_price is not "Null" or None:
+            if item_price is not None:
                 buff_price += item_price
         return round(buff_price, 2), round(steam_price, 2), num
 
