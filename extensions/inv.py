@@ -53,11 +53,11 @@ class Inventory(commands.Cog):
     def cog_unload(self):
         self.refresh_cache.cancel()
 
-    @tasks.loop(hours=4.0)
+    @tasks.loop(hours=2.0)
     async def refresh_cache(self):
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                "https://prices.csgotrader.app/latest/prices_v6.json"
+                "https://prices.csgotrader.app/latest/buff163.json"
             ) as resp:
                 raw_prices = await resp.text()
                 prices = json.loads(raw_prices)
@@ -165,17 +165,10 @@ class Inventory(commands.Cog):
             pricemedian = item.get("pricemedian", "N/A")
             steam_price += pricemedian
             name = item.get("markethashname", "N/A")
-            item_data = self.price_cache.get(name)
-            if item_data is not None:
-                buff_data = item_data.get("buff163")
-                if buff_data is not None:
-                    starting_at = buff_data.get("starting_at")
-                    item_price = starting_at.get("price")
-                else:
-                    buff_data = None
-            else:
-                item_data = None
-            if item_price is not None:
+            buff_data = self.price_cache.get(name)
+            starting_at = buff_data.get("starting_at")
+            item_price = starting_at.get("price")
+            if item_price is not "Null" or None:
                 buff_price += item_price
         return round(buff_price, 2), round(steam_price, 2), num
 

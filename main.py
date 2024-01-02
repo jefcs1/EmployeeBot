@@ -27,9 +27,7 @@ class MyBot(commands.Bot):
         if TESTING:
             return
         if ctx.cog:
-            if ctx.cog.has_error_handler():
-                return
-            if ctx.command.has_error_handler():
+            if ctx.cog.has_error_handler() or ctx.command.has_error_handler():
                 return
         if isinstance(error, commands.CommandNotFound):
             return
