@@ -1,12 +1,13 @@
 import asyncio
 import logging
+from random import randint
 
 import aiosqlite
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-from config import DB, admin_id, manager_id, founder_id
+from config import DB, admin_id, founder_id, manager_id
 
 
 class Fun(commands.Cog):
@@ -133,6 +134,31 @@ class Fun(commands.Cog):
                 await conn.commit()
             await Fun.cog_load(self)
             await ctx.send("Done!")
+
+    @commands.command(
+        name="randomcucumber", description="Chooses a random number of cucumbers!"
+    )
+    async def randomcucumber(self, ctx):
+        num_cucumbers = randint(1, 50)
+        cucumber_emoji = ":cucumber:" * num_cucumbers
+        await ctx.channel.send(f"{cucumber_emoji}\n{num_cucumbers} cucumbers!")
+
+    @commands.command(name="randomnumber", description="Chooses a random number!")
+    async def randomnumber(self, ctx):
+        number = randint(1, 100)
+        await ctx.channel.send(number)
+
+    @commands.command(name="check9ine", description="Checks how much jef has lost!")
+    async def check9ine(self, ctx, number: float):
+        result = ((4.6 - number) * 100) + ((3.85 - number) * 51)
+        if result > 0:
+            await ctx.send(
+                f"Jef has lost: ${abs(round(result,2))}! He's going to commit suicide soon!"
+            )
+        else:
+            await ctx.send(
+                f"Jef has gained: ${abs(round(result,2))}! He has no plans of suicide!"
+            )
 
 
 async def setup(bot: commands.Bot) -> None:

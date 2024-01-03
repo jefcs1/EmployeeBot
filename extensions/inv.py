@@ -1,12 +1,12 @@
 import json
 import logging
 import re
+import time
 from typing import Dict, NamedTuple, Optional
 
 import aiohttp
 import aiosqlite
 import discord
-import time
 from discord.ext import commands, tasks
 
 from config import DB, api_key, steamweb_apikey
@@ -30,6 +30,17 @@ role_thresholds = {
     "$500,000": 500000,
     "$1,000,000": 1000000,
 }
+
+phases = [
+    "phase1",
+    "phase2",
+    "phase3",
+    "phase4",
+    "ruby",
+    "sapphire",
+    "emerald",
+    "black pearl",
+]
 
 
 class ProfileInfo(NamedTuple):
@@ -157,19 +168,44 @@ class Inventory(commands.Cog):
             result = 200
         return result
 
+    async def format_phases(self, imageurl):
+        for phase in phases:
+            if phase in imageurl:
+                s = phase.split()
+                p = " ".join(word.capitalize() for word in s)
+                if p.startswith("Phase"):
+                    formatted = f"{p[:5]} {p[5:]}"
+                    return formatted
+                else:
+                    return p
+            else:
+                continue
+
     async def add_prices(self, data):
         steam_price = 0
         buff_price = 0
         num = len(data)
         for item in data:
             pricemedian = item.get("pricemedian", "N/A")
+            link = item.get("inspectlink")
             steam_price += pricemedian
             name = item.get("markethashname", "N/A")
             buff_data = self.price_cache.get(name)
-            starting_at = buff_data.get("starting_at")
-            item_price = starting_at.get("price")
-            if item_price is not None:
-                buff_price += item_price
+            if "doppler" in name.lower():
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(
+                        f"https://api.csgotrader.app/float?url={link}"
+                    ) as resp:
+                        dopplerinfo = await resp.json()
+                imageurl = dopplerinfo["iteminfo"]["imageurl"]
+                dopplerphase = await self.format_phases(imageurl)
+                price = buff_data["starting_at"]["doppler"][f"{dopplerphase}"]
+                buff_price += price
+            else:
+                starting_at = buff_data.get("starting_at")
+                item_price = starting_at.get("price")
+                if item_price is not None:
+                    buff_price += item_price
         return round(buff_price, 2), round(steam_price, 2), num
 
     @commands.command()
